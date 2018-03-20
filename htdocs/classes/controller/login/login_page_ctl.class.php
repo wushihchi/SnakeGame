@@ -12,9 +12,10 @@ class Login_Page_Ctl extends Controller
     public function post_login()
     {
         $oModel = new Snakegame_Player_Model;
-
+        $sPlayerEmail = Input::post('s','playeremail');
+        $sPlayerPwd = Input::post('s','playerpwd');
         $aEmailExist = $oModel->get(
-            array('player_email'=>$_POST["playeremail"]), 
+            array('player_email'=>$sPlayerEmail), 
             array('field'=>'player_id'
         ));
 
@@ -24,7 +25,7 @@ class Login_Page_Ctl extends Controller
         }
 
         $aPlayerList = $oModel->get(
-            array('player_email'=>$_POST["playeremail"], 'player_pwd'=>md5($_POST["playerpwd"])),
+            array('player_email'=>$sPlayerEmail, 'player_pwd'=>md5($sPlayerPwd)),
             array('field'=>'player_id', 'player_nm')
         );
         

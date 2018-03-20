@@ -57,10 +57,11 @@ class Main_Page_Ctl extends Controller
     public function post_save()
     {
         $oModel = new Snakegame_Score_Model;
-
+        $iScore = Input::post('i','score');
+        $sPlayerId = Input::post('s','player_id');
         $primary_key = $oModel->insert(array(
-            'score'  => $_POST["score"],
-            'player_id' => $_POST["player_id"],
+            'score'  => $iScore,
+            'player_id' => $sPlayerId,
             'play_dtm'   => date ("Y-m-d H:i:s", mktime(date('H')+7, date('i'), date('s'), date('m'), date('d'), date('Y'))),
         ));
 

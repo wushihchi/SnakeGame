@@ -4,8 +4,6 @@ class Regist_Page_Ctl extends Controller
 {
     public function get_index()
     {
-        session_start();
-        $_SESSION['pagename']='regist';
         return Smarty_View::make('regist/regist.html', array());
     }
 
@@ -13,12 +11,14 @@ class Regist_Page_Ctl extends Controller
     public function post_insert()
     {
         $oModel = new Snakegame_Player_Model;
-        $sPlayerNm = str_replace("'", "''", $_POST["playernm"]);
+        $sPlayerNm = str_replace("'", "''", Input::post('s','playernm'));
+        $sPlayerEmail = str_replace("'", "''", Input::post('s','playeremail'));
+        $sPlayerPwd = str_replace("'", "''", Input::post('s','playerpwd'));
 
         $primary_key = $oModel->insert(array(
             'player_nm'  => $sPlayerNm,
-            'player_email' => $_POST["playeremail"],
-            'player_pwd' => md5($_POST["playerpwd"]),
+            'player_email' => $sPlayerEmail,
+            'player_pwd' => md5($sPlayerPwd),
         ));
         unset($oModel);
         if ($primary_key) {
@@ -31,7 +31,7 @@ class Regist_Page_Ctl extends Controller
     public function post_checkemailexist()
     {
         $oModel = new Snakegame_Player_Model;
-        $sPlayerEmail = str_replace("'", "''", $_POST["playeremail"]);
+        $sPlayerEmail = str_replace("'", "''", Input::post('s','playeremail'));
         $aChkPlayerEmail = $oModel->get(
             array('player_email' => $sPlayerEmail), 
             array('field' => 'player_id')
@@ -49,7 +49,7 @@ class Regist_Page_Ctl extends Controller
     public function post_checknameexist()
     {
         $oModel = new Snakegame_Player_Model;
-        $sPlayerNm = str_replace("'", "''", $_POST["playernm"]);
+        $sPlayerNm = str_replace("'", "''", Input::post('s','playernm'));
         $aChkPlayerNm = $oModel->get(
             array('player_nm' => $sPlayerNm), 
             array('field' => 'player_id')
