@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+		<script type="text/javascript">
+
+		</script>
+		<title>分數歷史紀錄</title>
+	</head>
+	<body style="background-color:transparent;">
+		<form method="post">
+			<div class="container">
+				<table class="table" border="0">
+					{{$idx=0}}
+					<tr>
+						<td align="cneter" nowrap>
+							<strong><font color="#FFFF00">紀錄排名</font></strong>
+						</td>
+						<td align="cneter" nowrap>
+							<strong><font color="#FFFF00">分數</font></strong>
+						</td>
+						<td align="cneter">
+							<strong><font color="#FFFF00">記錄更新時間</font></strong>
+						</td>
+					</tr>
+					{{foreach from=$scorelist item=item}}
+					{{$idx=$idx+1}}
+					<tr>
+						<td align="cneter" nowrap><strong><font color="#FFFF00" size="5px">{{$idx}}</font></strong></td>
+						<td align="cneter"><strong><font color="#FFFF00" size="5px">{{$item.score}}</font></strong></td>
+						<td align="cneter"><strong><font color="#FFFF00" size="5px">{{$item.play_dtm}}</font></strong></td>
+					</tr>
+					{{/foreach}}
+				</table>
+			</div>
+		</form>
+	</body>
+</html>
+

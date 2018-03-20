@@ -1,0 +1,76 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<style>
+			body { 
+				background-image: url('/www/assets/vendor/images/green-nature.jpg');
+				background-repeat:no-repeat;
+				background-size: cover;
+				text-align:center;
+			}
+		</style>
+		<script type="text/javascript">
+		function submit_btn()
+		{
+			$.ajax({
+			 	url: "/www/login/page/login",
+				method:"post",
+				async:false,
+				data: {playeremail:$('#playerEmail').val(),playerpwd:$('#playerPwd').val()}
+			}).done(function(result){
+				if(result){
+					location.href='/www/main/page';
+				}else{
+					alert('Email帳號或密碼輸入不正確,請確認!!');
+					return false;
+				}
+			});
+			
+		}
+		</script>
+	</head>
+	<body>
+		<form method="post" name="loginForm" id="loginForm">
+			<div class="container">
+				<br><br>
+				<table class="table" style="background-color:#4CAF50;">
+					<tr>
+						<td align="right" nowrap>Email帳號:</td>
+						<td align="left">
+							<input type="text" name="playerEmail" id="playerEmail" size="18" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" nowrap>密碼:</td>
+						<td align="left">
+							<input type="password" name="playerPwd" id="playerPwd" size="18" />
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" align="right">
+							<div class="btn-group btn-group-justified">
+							   	<div class="btn-group">
+							   	 	<input type="button" class="form-control btn-warning" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
+							 	</div>
+							 	<div class="btn-group">
+							    	<input type="button" class="form-control btn-warning" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+				
+			</div>
+		</form>
+	</body>
+</html>
+

@@ -1,0 +1,183 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<style>
+			body { 
+				background-image: url('/www/assets/vendor/images/green-nature.jpg');
+				background-repeat:no-repeat;
+				background-size: cover;
+				text-align:center;
+			}
+		</style>
+		<script type="text/javascript">
+		function submitFunc()
+		{
+			var playerName = $('#playerName').val().trim();
+			var playerEmail = $('#playerEmail').val().trim();
+			if(playerName==''){
+				alert('暱稱未輸入，請確認!');
+				return false;
+			}
+			if(playerEmail==''){
+				alert('Email帳號未輸入，請確認!');
+				return false;
+			}
+
+            var emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+
+			if (playerEmail.search(emailRule)== -1) {
+				alert('Email格式錯誤,請確認!!');
+				return false;
+			}
+
+			if (!chkEmailExist(playerEmail)) {
+				alert('Email已存在,請重新輸入!');
+				return false;
+			}
+
+			if (!chkNameExist(playerName)) {
+				alert('暱稱已存在!!!!,請重新輸入!');
+				return false;
+			}
+
+			if (!chkpwd()) {
+				return false;
+			}
+			
+			var playerPwd = $('#playerPwd').val();
+			regist_func(playerName,playerEmail,playerPwd);
+
+		}
+
+		function chkEmailExist(iplayerEmail)
+		{
+			var RtnVal = true;
+			$.ajax({
+			 	url: "/www/regist/page/checkemailexist",
+				method:"post",
+				async:false,
+				data: {playeremail:iplayerEmail}
+			}).done(function(result) {
+				if (result) {
+					RtnVal = true;
+				} else {
+					RtnVal = false;
+				}
+				
+			});
+			return RtnVal;
+		}
+
+		//檢查暱稱是否已存在
+		function chkNameExist(iplayerNm){
+			var RtnVal = true;
+			$.ajax({
+			 	url: "/www/regist/page/checknameexist",
+				method:"post",
+				async:false,
+				data: {playernm:iplayerNm}
+			}).done(function(result) {
+				if (result) {
+					RtnVal = true;
+				} else {
+					RtnVal = false;
+				}
+			});
+			return RtnVal;
+		}
+
+		//檢查密碼與密碼確認是否一致
+		function chkpwd()
+		{
+			if($('#playerPwd1').val().trim()==''||$('#playerPwd2').val().trim()==''){
+				alert('密碼與確認密碼皆須輸入，請確認!');
+				return false;
+			}else{
+				if($('#playerPwd1').val()!=$('#playerPwd2').val()){
+					alert('密碼與確認密碼輸入不一致，請確認!');
+					return false;
+				}else{
+					$('#playerPwd').val($('#playerPwd1').val());
+					return true;
+				}
+			}
+			
+		}
+
+		function regist_func(iPlayerNm,iPlayerEmail,iPlayerPwd)
+		{
+			$.ajax({
+			    url: "/www/regist/page/insert",
+			    method:"post",
+			    data: {playernm:iPlayerNm,playeremail:iPlayerEmail,playerpwd:iPlayerPwd}
+			}).done(function(result) {
+				//alert(result);
+				if(result){
+					location.href = '/www/login/page';
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+		</script>
+	</head>
+	<body>
+		<form method="post">
+			<div class="container">
+				<br><br>
+				<table class="table" style="background-color:#4CAF50;">
+					<tr>
+						<td align="right" nowrap>暱稱:</td>
+						<td align="left">
+							<input type="text" name="playerName" id="playerName" size="18" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" nowrap>Email帳號:</td>
+						<td align="left">
+							<input type="text" name="playerEmail" id="playerEmail"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" nowrap>密碼:</td>
+						<td align="left">
+							<input type="password" name="playerPwd1" id="playerPwd1"/>
+							<input type="hidden" name="playerPwd" id="playerPwd"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" nowrap>密碼確認:</td>
+						<td align="left">
+							<input type="password" name="playerPwd2" id="playerPwd2"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" align="right">
+							<div class="btn-group btn-group-justified">
+								<div class="btn-group">
+							 		<input type="button" class="form-control btn-warning" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
+							 	</div>
+							 	<div class="btn-group">
+							   	 	<input type="button" class="form-control btn-warning" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
+							 	</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+				
+			</div>
+		</form>
+	</body>
+</html>
+
