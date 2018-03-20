@@ -54,6 +54,45 @@ class Main_Page_Ctl extends Controller
         
     }
 
+    public function get_rank()
+    {
+         if ($this->chkSession()) {
+            //取得最高分
+            $oModel = new Snakegame_Score_Model;
+            
+            $aScoreList = $oModel->find(array(), array(
+                'field' => 'score_id, score,player_id,play_dtm',
+                'limit' => '10',
+                'order' => 'score desc'
+            ));
+
+            $oPlayerModel = new Snakegame_Player_Model;
+
+            $aPlayerAry = $oModel->find_col('player_id',array(),array('field' => 'player_id'));
+            $aPlayerList = $oPlayerModel->find_pair(
+                'player_id',
+                'player_nm',
+                array('player_id'=>$aPlayerAry),
+                array()
+            );
+
+            //$temp = $this->maskString("star");
+            //return $temp;
+            
+            foreach ($aScoreList as $iKey => $aValue) {
+                $sTempPlayerNm = $aPlayerList[$aScoreList[$iKey]['player_id']];
+                $aScoreList[$iKey]['player_nm'] = $this->maskString($sTempPlayerNm);
+            }
+
+            unset($oModel);
+
+            return Smarty_View::make('main/rank.html', array('scorelist'=> $aScoreList,'topscore'=> $iTopScore));
+        } else {
+            return Smarty_View::make('login/login.html');
+        }
+        
+    }
+
     public function post_save()
     {
         $oModel = new Snakegame_Score_Model;
@@ -81,6 +120,35 @@ class Main_Page_Ctl extends Controller
         } else {
             return true;
         }
+    }
+
+    private function maskString($s)
+    {
+        $masknum = 3;
+        $len = strlen($s);
+        /*
+        if($masknum<0) {
+            $masknum = $len + $masknum;
+        }*/
+        if($len < 3) {
+            return $s;
+        }elseif ($len < $masknum+1) {
+            return substr($s,0,1).str_repeat('*',$len-2).substr($s,-1);
+        }
+        $right = ($len - $masknum) >> 1;
+        if($right == 0){
+            $rightStr = "";
+        }else{
+            $rightStr = substr($s,-$right);
+        }
+        $left = $len-$right- $masknum;
+        if($left == 0){
+            $leftStr = "";
+        }else{
+            $leftStr = substr($s,0,$left);
+        }
+        
+        return $leftStr.str_repeat('*',$len-$right-$left).$rightStr;
     }
 }
 

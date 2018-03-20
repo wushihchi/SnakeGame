@@ -26,6 +26,11 @@
 			if(playerName==''){
 				alert('暱稱未輸入，請確認!');
 				return false;
+			}else{
+				if(playerName.length<4){
+					alert('暱稱最少需四個字，請確認!');
+					return false;
+				}
 			}
 			if(playerEmail==''){
 				alert('Email帳號未輸入，請確認!');

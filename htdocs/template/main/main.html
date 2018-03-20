@@ -8,7 +8,7 @@
 		    body { background-image : url('/www/assets/vendor/images/green-nature.jpg');background-repeat:no-repeat;background-size: cover;-moz-user-select:none; text-align:center; font-size:12px } /*防止滑鼠拖拉*/
 		    table { margin:20px auto 10px auto; overflow:hidden; border-collapse:collapse }
 		    td { width:20px; height:20px; border:1px solid #696969; background:#000 }
-		    .cover { background:#32CD32 } /*蛇身:淺藍色*/
+		    .cover { background:#32CD32 } /*蛇身:綠色*/
 		    .food { background:#FF8800 } /*食物:橘色*/
 		    .block { background:gray } /*障礙:灰色*/
 		    .brake { background:#f00 } /*刹車:紅色*/
@@ -22,6 +22,48 @@
 		    .btn01{
 		    	font-weight:bold; clear:both; width:420px; margin-left: 0px; height:30px; margin-top:10px;margin-bottom:20px; padding:0; background:#4CAF50; color:#000; border:1px solid #66CDAA; border-bottom-color:#006400; border-right-color:#006400; cursor:pointer
 		    }
+
+
+		    #div1{
+			　width:120px;
+			　float:left;
+			　height:280px;
+			　text-align:center;
+			　line-height:280px;
+			　font-size:15px;
+			　color:#ffffff;
+			　font-weight:bold;
+			}
+			#div2{
+			　width:240px;
+			　height:280px;
+			　text-align:center;
+			　line-height:280px;
+			　font-size:15px;
+			　color:#f9c81e;
+			　font-weight:bold;
+			　float:right;
+			}
+			#Footer{
+			　width:360px;
+			　height:80px;
+			　text-align:center;
+			　line-height:80px;
+			　font-size:15px;
+			　color:#fffaf3;
+			　font-weight:bold;
+			　background-color:#f9c81e;
+			}
+			#Header{
+			　width:360px;
+			　height:80px;
+			　text-align:center;
+			　line-height:80px;
+			　font-size:15px;
+			　color:#fffaf3;
+			　font-weight:bold;
+			　background-color:#f9c81e;
+			}
 		</style>
 
 		<script type="text/javascript">
@@ -236,6 +278,7 @@
 		        //吃東西
 		        //吃-只加頭-移動和增長效果
 		        //動-刪尾&加頭-移動效果
+		        console.log('carrierXY=['+carrierXY+']');
 		        if(carrierXY != "food") {
 		            //單純移動
 		            var snake1 = snake.length - 1;
@@ -383,18 +426,26 @@
 
 	<body onSelectStart="return false"><!--防止滑鼠拖拉-->
 		<input type="hidden" name="player_id" id="player_id" value="{{$player_id}}"/>
-
-		<div id="score">0</div>		
-		<div id="say">貪食蛇</div>
-		<div id="snakeWrap"></div>
-		<div id="help">
-		    <span class="box food"></span><span>食物</span>
-		    <span class="box block"></span><span>障礙</span>
-		    <span class="box skate"></span><span>滑板</span>
-		    <span class="box brake"></span><span>刹車</span>
-		    <input type="button" class="button" id="btnStart" value="Start"/>
+		<div id="Header"></div>
+		<div class="div1">
+			<div id="score">0</div>		
+			<div id="say">貪食蛇</div>
+			<div id="snakeWrap"></div>
+			<div id="help">
+			    <span class="box food"></span><span>食物</span>
+			    <span class="box block"></span><span>障礙</span>
+			    <span class="box skate"></span><span>滑板</span>
+			    <span class="box brake"></span><span>刹車</span>
+			    <input type="button" class="button" id="btnStart" value="Start"/>
+			</div>
+			<iframe allowTransparency="true" src="/www/main/page/score" width="600px" height="300px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
 		</div>
-		<iframe allowTransparency="true" src="/www/main/page/score" width="600px" height="300px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
+		<div class="div2">
+			<iframe allowTransparency="true" src="/www/main/page/rank" width="600px" height="600px" frameborder="0" scrolling="no" name="rankiframe" id="rankiframe"></iframe>
+		</div>
+
+		<div style='clear:both;'></div>
+		<div id="Footer"></div>		
 		<br><input type="button" class="btn01" value="Logout" onclick="location.href='/www/login/page/logout'" />
 		
 	</body>
