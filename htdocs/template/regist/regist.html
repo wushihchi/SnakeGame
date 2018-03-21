@@ -17,6 +17,26 @@
 				background-size: cover;
 				text-align:center;
 			}
+			table{
+				background:rgba(0,128,0,0.5);
+				color:#000000;
+				font-weight:bold;
+				text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+			}
+			.btn01{
+		    	font-weight:bold; 
+		    	width:95%; 
+		    	height:30px; 
+		    	background:#4CAF50; 
+		    	color:#000; 
+		    	border:1px solid #66CDAA; 
+		    	border-bottom-color:#006400; 
+		    	border-right-color:#006400; 
+		    	cursor:pointer;
+		    	text-align:center;
+		    	font-weight:bold;
+		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+		    }
 		</style>
 		<script type="text/javascript">
 		function submitFunc()
@@ -139,42 +159,38 @@
 	</head>
 	<body>
 		<form method="post">
-			<div class="container">
+			<div class="container" style="width:30%">
 				<br><br>
-				<table class="table" style="background-color:#4CAF50;">
+				<table class="table">
 					<tr>
-						<td align="right" nowrap>暱稱:</td>
-						<td align="left">
-							<input type="text" name="playerName" id="playerName" size="18" />
+						<td align="center" nowrap style="vertical-align:middle;">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;暱稱：<input type="text" name="playerName" id="playerName" placeholder="輸入長度4以上"/>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" nowrap>Email帳號:</td>
-						<td align="left">
-							<input type="text" name="playerEmail" id="playerEmail"/>
+						<td align="center" nowrap style="vertical-align:middle;">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;帳號：<input type="text" name="playerEmail" id="playerEmail" placeholder="請輸入Email"/>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" nowrap>密碼:</td>
-						<td align="left">
-							<input type="password" name="playerPwd1" id="playerPwd1"/>
+						<td align="center" nowrap style="vertical-align:middle;">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;密碼：<input type="password" name="playerPwd1" id="playerPwd1" placeholder="請輸入密碼"/>
 							<input type="hidden" name="playerPwd" id="playerPwd"/>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" nowrap>密碼確認:</td>
-						<td align="left">
-							<input type="password" name="playerPwd2" id="playerPwd2"/>
+						<td align="center" nowrap style="vertical-align:middle;">
+							密碼確認：<input type="password" name="playerPwd2" id="playerPwd2" placeholder="密碼確認"/>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2" align="right">
+						<td align="center">
 							<div class="btn-group btn-group-justified">
 								<div class="btn-group">
-							 		<input type="button" class="form-control btn-warning" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
+							 		<input type="button" class="form-control btn01" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
 							 	</div>
 							 	<div class="btn-group">
-							   	 	<input type="button" class="form-control btn-warning" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
+							   	 	<input type="button" class="form-control btn01" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
 							 	</div>
 							</div>
 						</td>

@@ -81,12 +81,20 @@ class Main_Page_Ctl extends Controller
             
             foreach ($aScoreList as $iKey => $aValue) {
                 $sTempPlayerNm = $aPlayerList[$aScoreList[$iKey]['player_id']];
-                $aScoreList[$iKey]['player_nm'] = $this->maskString($sTempPlayerNm);
+                if($aScoreList[$iKey]['player_id']!=$_SESSION['player_id']){
+                    $sTempPlayerNm = $this->maskString($sTempPlayerNm);
+                }
+                $aScoreList[$iKey]['player_nm'] = $sTempPlayerNm;                
             }
 
             unset($oModel);
 
-            return Smarty_View::make('main/rank.html', array('scorelist'=> $aScoreList,'topscore'=> $iTopScore));
+            return Smarty_View::make('main/rank.html',array(
+                'scorelist'=> $aScoreList,
+                'topscore'=> $iTopScore,
+                'player_id'=> $_SESSION['player_id']
+            ));
+
         } else {
             return Smarty_View::make('login/login.html');
         }
@@ -139,7 +147,8 @@ class Main_Page_Ctl extends Controller
         if($right == 0){
             $rightStr = "";
         }else{
-            $rightStr = substr($s,-$right);
+            //$rightStr = substr($s,-$right);
+            $rightStr = str_repeat('*',$right);
         }
         $left = $len-$right- $masknum;
         if($left == 0){

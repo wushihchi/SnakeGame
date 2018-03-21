@@ -17,6 +17,26 @@
 				background-size: cover;
 				text-align:center;
 			}
+			.btn01{
+		    	font-weight:bold; 
+		    	width:95%; 
+		    	height:30px; 
+		    	background:#4CAF50; 
+		    	color:#000; 
+		    	border:1px solid #66CDAA; 
+		    	border-bottom-color:#006400; 
+		    	border-right-color:#006400; 
+		    	cursor:pointer;
+		    	text-align:center;
+		    	font-weight:bold;
+		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+		    }
+		    table{
+		    	background:rgba(0,128,0,0.5);
+		    	color:#000000;
+		    	font-weight:bold;
+		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+		    }
 		</style>
 		<script type="text/javascript">
 		function submit_btn()
@@ -40,29 +60,27 @@
 	</head>
 	<body>
 		<form method="post" name="loginForm" id="loginForm">
-			<div class="container">
+			<div class="container" style="width:30%">
 				<br><br>
-				<table class="table" style="background-color:#4CAF50;">
+				<table class="table">
 					<tr>
-						<td align="right" nowrap>Email帳號:</td>
-						<td align="left">
-							<input type="text" name="playerEmail" id="playerEmail" size="18" />
+						<td align="center" nowrap style="vertical-align:middle;">
+							帳號：<input type="text" name="playerEmail" id="playerEmail" size="18" placeholder="Email帳號"/>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" nowrap>密碼:</td>
-						<td align="left">
-							<input type="password" name="playerPwd" id="playerPwd" size="18" />
+						<td align="center" nowrap style="vertical-align:middle;">
+							密碼：<input type="password" name="playerPwd" id="playerPwd" size="18" placeholder="密碼"/>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2" align="right">
+						<td align="center">
 							<div class="btn-group btn-group-justified">
 							   	<div class="btn-group">
-							   	 	<input type="button" class="form-control btn-warning" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
+							   	 	<input type="button" class="form-control btn01" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
 							 	</div>
 							 	<div class="btn-group">
-							    	<input type="button" class="form-control btn-warning" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
+							    	<input type="button" class="form-control btn01" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
 								</div>
 							</div>
 						</td>
