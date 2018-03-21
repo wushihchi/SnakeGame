@@ -19,29 +19,39 @@
 
 		</script>
 		<title>分數歷史紀錄</title>
+		<style type="text/css">
+			.text {
+				text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+				color:#FF1493;
+				font-size:20px;
+			}
+		</style>
 	</head>
 	<body style="background-color:transparent;">
 		<form method="post">
 			<div class="container">
 				<table class="table" border="0">
+					<tr>
+						<td colspan="3"><font class="text">★★★Record★★★</font></td>
+					</tr>
 					{{$idx=0}}
 					<tr>
 						<td align="cneter" nowrap>
-							<strong><font color="#FFFF00">紀錄排名</font></strong>
+							<strong><font class="text">紀錄排名</font></strong>
 						</td>
 						<td align="cneter" nowrap>
-							<strong><font color="#FFFF00">分數</font></strong>
+							<strong><font class="text">分數</font></strong>
 						</td>
 						<td align="cneter">
-							<strong><font color="#FFFF00">記錄更新時間</font></strong>
+							<strong><font class="text">記錄更新時間</font></strong>
 						</td>
 					</tr>
 					{{foreach from=$scorelist item=item}}
 					{{$idx=$idx+1}}
 					<tr>
-						<td align="cneter" nowrap><strong><font color="#FFFF00" size="5px">{{$idx}}</font></strong></td>
-						<td align="cneter"><strong><font color="#FFFF00" size="5px">{{$item.score}}</font></strong></td>
-						<td align="cneter"><strong><font color="#FFFF00" size="5px">{{$item.play_dtm}}</font></strong></td>
+						<td align="cneter" nowrap><strong><font class="text">{{$idx}}</font></strong></td>
+						<td align="cneter"><strong><font class="text">{{$item.score}}</font></strong></td>
+						<td align="cneter"><strong><font class="text">{{$item.play_dtm}}</font></strong></td>
 					</tr>
 					{{/foreach}}
 				</table>

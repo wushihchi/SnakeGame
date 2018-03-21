@@ -20,50 +20,8 @@
 		    #help .box { width:15px; height:15px; margin-right:5px; border:0px solid #227700;}
 		    #btnStart { font-weight:bold; clear:both; width:420px; margin-left: 0px; height:50px; margin-top:10px;margin-bottom:20px; padding:0; background:#4CAF50; color:#000; border:1px solid #66CDAA; border-bottom-color:#006400; border-right-color:#006400; cursor:pointer }
 		    .btn01{
-		    	font-weight:bold; clear:both; width:420px; margin-left: 0px; height:30px; margin-top:10px;margin-bottom:20px; padding:0; background:#4CAF50; color:#000; border:1px solid #66CDAA; border-bottom-color:#006400; border-right-color:#006400; cursor:pointer
+		    	font-weight:bold; width:420px; height:30px; background:#4CAF50; color:#000; border:1px solid #66CDAA; border-bottom-color:#006400; border-right-color:#006400; cursor:pointer;text-align:center;
 		    }
-
-
-		    #div1{
-			　width:120px;
-			　float:left;
-			　height:280px;
-			　text-align:center;
-			　line-height:280px;
-			　font-size:15px;
-			　color:#ffffff;
-			　font-weight:bold;
-			}
-			#div2{
-			　width:240px;
-			　height:280px;
-			　text-align:center;
-			　line-height:280px;
-			　font-size:15px;
-			　color:#f9c81e;
-			　font-weight:bold;
-			　float:right;
-			}
-			#Footer{
-			　width:360px;
-			　height:80px;
-			　text-align:center;
-			　line-height:80px;
-			　font-size:15px;
-			　color:#fffaf3;
-			　font-weight:bold;
-			　background-color:#f9c81e;
-			}
-			#Header{
-			　width:360px;
-			　height:80px;
-			　text-align:center;
-			　line-height:80px;
-			　font-size:15px;
-			　color:#fffaf3;
-			　font-weight:bold;
-			　background-color:#f9c81e;
-			}
 		</style>
 
 		<script type="text/javascript">
@@ -319,7 +277,7 @@
 	            //分數存檔
 	            saveScore(topScore);
 	            //document.frames('scoreiframe').location.reload();
-	            window.frames['scoreiframe'].location.reload();
+	            
 	            return false; //停止Javascript的處理程式
 		    }
 
@@ -332,7 +290,8 @@
 				    data: {score:iScore,player_id:Player}
 				}).done(function(result) {
 					if(result){
-						//location.reload();
+						window.frames['scoreiframe'].location.reload();
+						window.frames['rankiframe'].location.reload();
 					}else{
 						alert('error');
 						return false;
@@ -420,14 +379,20 @@
 		            btnStart.style.color = "#696969"; //中等亮度的灰色陰影
 		            start(); //遊戲開始
 		        }
+		        window.setInterval("reloadIFrame();", 30000);
 		    }
+
+		    function reloadIFrame() {
+			 	window.frames['rankiframe'].location.reload();
+			}
 		</script>
 	</head>
 
 	<body onSelectStart="return false"><!--防止滑鼠拖拉-->
-		<input type="hidden" name="player_id" id="player_id" value="{{$player_id}}"/>
-		<div id="Header"></div>
-		<div class="div1">
+		<div id="Header">
+			<input type="hidden" name="player_id" id="player_id" value="{{$player_id}}"/>
+		</div>
+		<div id="div1" style="float:left;width:100%;height:280px;text-align:center;line-height:80px;">
 			<div id="score">0</div>		
 			<div id="say">貪食蛇</div>
 			<div id="snakeWrap"></div>
@@ -440,14 +405,10 @@
 			</div>
 			<iframe allowTransparency="true" src="/www/main/page/score" width="600px" height="300px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
 		</div>
-		<div class="div2">
+		<div id="div2" style="float:right;width:40%;height:280px;text-align:center;line-height:80px;">
 			<iframe allowTransparency="true" src="/www/main/page/rank" width="600px" height="600px" frameborder="0" scrolling="no" name="rankiframe" id="rankiframe"></iframe>
-		</div>
-
-		<div style='clear:both;'></div>
-		<div id="Footer"></div>		
-		<br><input type="button" class="btn01" value="Logout" onclick="location.href='/www/login/page/logout'" />
-		
+			<input type="button" class="btn01" value="Logout" onclick="location.href='/www/login/page/logout'" />
+		</div>		
 	</body>
 
 </html>
