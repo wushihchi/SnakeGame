@@ -19,6 +19,8 @@
 
 		</script>
 		<style>
+			body {
+			}
 			.text {
 				text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
 				color:red;
@@ -32,7 +34,7 @@
 			<div class="container">
 				<table class="table" border="0">
 					<tr>
-						<td colspan="4"><font class="text">★★★RANK★★★</font></td>
+						<td colspan="4"><font class="text" style="font-size: 52px;">★★★RANK★★★</font></td>
 					</tr>
 					{{$idx=0}}
 					<tr>
@@ -45,7 +47,7 @@
 						<td align="cneter" nowrap>
 							<strong><font class="text">分數</font></strong>
 						</td>
-						<td align="cneter">
+						<td align="cneter" nowrap>
 							<strong><font class="text">記錄更新時間</font></strong>
 						</td>
 					</tr>
@@ -54,8 +56,8 @@
 					<tr {{if ($item.player_id==$player_id)}}style="background:rgba(255,255,0,0.6);"{{/if}}>
 						<td align="cneter" nowrap><strong><font class="text">{{$idx}}</font></strong></td>
 						<td align="cneter" nowrap><strong><font class="text">{{$item.player_nm}}</font></strong></td>
-						<td align="cneter"><strong><font class="text">{{$item.score}}</font></strong></td>
-						<td align="cneter"><strong><font class="text">{{$item.play_dtm}}</font></strong></td>
+						<td align="cneter" nowrap><strong><font class="text">{{$item.score}}</font></strong></td>
+						<td align="cneter" nowrap><strong><font class="text">{{$item.play_dtm}}</font></strong></td>
 					</tr>
 					{{/foreach}}
 				</table>

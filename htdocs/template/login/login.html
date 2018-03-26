@@ -60,33 +60,34 @@
 	</head>
 	<body>
 		<form method="post" name="loginForm" id="loginForm">
-			<div class="container" style="width:30%">
+			<div class="container" >
 				<br><br>
-				<table class="table">
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							帳號：<input type="text" name="playerEmail" id="playerEmail" size="18" placeholder="Email帳號"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							密碼：<input type="password" name="playerPwd" id="playerPwd" size="18" placeholder="密碼"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center">
-							<div class="btn-group btn-group-justified">
-							   	<div class="btn-group">
-							   	 	<input type="button" class="form-control btn01" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
-							 	</div>
-							 	<div class="btn-group">
-							    	<input type="button" class="form-control btn01" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
+				<div class=" col-md-offset-4 col-md-4">
+					<table class="table">
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								帳號<input type="text" class="form-control" name="playerEmail" id="playerEmail" size="18" placeholder="Email帳號"/>
+							</td>
+						</tr>
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								密碼<input type="password" class="form-control" name="playerPwd" id="playerPwd" size="18" placeholder="密碼"/>
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<div class="btn-group btn-group-justified">
+								   	<div class="btn-group">
+								   	 	<input type="button" class="form-control btn01" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
+								 	</div>
+								 	<div class="btn-group">
+								    	<input type="button" class="form-control btn01" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
+									</div>
 								</div>
-							</div>
-						</td>
-					</tr>
-				</table>
-				
+							</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</form>
 	</body>

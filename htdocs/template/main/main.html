@@ -1,14 +1,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
 		<title>貪食蛇</title>
 		<style type="text/css">
 		    * { margin:0; padding:0 }  
-		    body { background-image : url('/www/assets/vendor/images/green-nature.jpg');background-repeat:no-repeat;background-size: cover;-moz-user-select:none; text-align:center; font-size:12px } /*防止滑鼠拖拉*/
+		    body { 
+		    	background-image : url('/www/assets/vendor/images/green-nature.jpg');
+		    	background-repeat:no-repeat;
+		    	background-attachment: fixed;
+            	background-position: center;
+		    	background-size: cover;
+		    	-moz-user-select:none; 
+		    	text-align:center; 
+		    	font-size:12px
+		    } /*防止滑鼠拖拉*/
 		    table { margin:20px auto 10px auto; overflow:hidden; border-collapse:collapse }
 		    td { width:20px; height:20px; border:1px solid #696969; background:#000 }
 		    .cover { background:#32CD32 } /*蛇身:綠色*/
+		    .snakehead { background:#006400 } /*蛇身:綠色*/
 		    .food { background:#FF8800 } /*食物:橘色*/
 		    .block { background:gray } /*障礙:灰色*/
 		    .brake { background:#f00 } /*刹車:紅色*/
@@ -21,7 +40,6 @@
 		    #btnStart { 
 		    	font-weight:bold; 
 		    	clear:both; 
-		    	width:420px; 
 		    	margin-left: 0px; 
 		    	height:50px; 
 		    	margin-top:10px;
@@ -37,15 +55,15 @@
 		    }
 		    .btn01{
 		    	font-weight:bold; 
-		    	width:420px; 
-		    	height:30px; 
 		    	background:#4CAF50; 
+		    	width:100%;
 		    	color:#000; 
 		    	border:1px solid #66CDAA; 
 		    	border-bottom-color:#006400; 
 		    	border-right-color:#006400; 
 		    	cursor:pointer;
 		    	text-align:center;
+		    	margin-top:10px;
 		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
 		    }
 		</style>
@@ -88,7 +106,10 @@
 		        snakeTimer, //蛇行走計時器
 		        brakeTimers = [], //隨機刹車
 		        skateTimers = [], //隨機滑板
+		        overMsg, //Gameover訊息
+		        chkDirect = true, //Gameover訊息
 		        directkey; //方向鍵值 37-40(左、上、右、下)
+
 		    function initGrid(iDiv)
 		    {
 		        //var body = $tag("body")[0];
@@ -146,13 +167,18 @@
 		    //創建蛇
 		    function initSnake()
 		    {
+		    	//len = 3;
 		        var len1 = len - 1;
 		        var pointer = randomPointer(len1, len1, WIDTH / 2, HEIGHT / 2);
+		        //console.log('pointer=['+pointer+']');
 		        for(var i = 0; i < len; i++) {
+
 		            var x = pointer[0] - i,
 		                y = pointer[1];
 		            snake.push([x, y]); //向陣列末尾添加一個或多個元素，並返回陣列的長度
+		            //console.log('x=['+x+']y=['+y+']');
 		            carrier[x][y] = "cover";
+		            
 		        }
 		    }
 		    //添加物品
@@ -209,18 +235,22 @@
 		                headY += 1;
 		                break;
 		        }
+		        chkDirect = true;
 		        //碰到邊界WIDTH or HEIGHT、障礙物block，則結束遊戲
 		        if(headX >= WIDTH || headX < 0 || headY >= HEIGHT || headY < 0){
-		        	trace("跑太遠了ლ(ﾟдﾟლ)");
+		        	overMsg = "跑太遠了ლ(ﾟдﾟლ)";
+		        	trace(overMsg);
 		        	gameOver();
 		        	return false;
 		        }else{
 		        	var carrierXY = carrier[headX][headY];
 			        if(carrierXY == "block" || carrierXY == "cover" ) {
 			        	if(carrierXY == "block"){
-			        		trace("頭好暈阿@~@");
+			        		overMsg = "頭好暈阿@~@";
+			        		trace(overMsg);
 			        	}else{
-			        		trace("打結了ヽ(o’Д`o)ノ");
+			        		overMsg = "打結了ヽ(o’Д`o)ノ";
+			        		trace(overMsg);
 			        	}
 			            gameOver();
 			            return false;
@@ -262,7 +292,7 @@
 		        //吃東西
 		        //吃-只加頭-移動和增長效果
 		        //動-刪尾&加頭-移動效果
-		        console.log('carrierXY=['+carrierXY+']');
+		        //console.log('carrierXY=['+carrierXY+']');
 		        if(carrierXY != "food") {
 		            //單純移動
 		            var snake1 = snake.length - 1;
@@ -279,8 +309,23 @@
 		            (speedup) ? trace("加速இдஇ") : trace("好吃好吃（▼皿▼＃");
 		        }
 		        snake.unshift([headX, headY]); //向陣列開頭添加一個元素，並返回新的陣列長度
+		        for(var idx=0;idx<len;idx++){
+
+		        }
 		        carrier[headX][headY] = "cover";//在2D資料內的紀錄蛇身
-		        gridElems[headX][headY].className = "cover";//蛇身在UI上
+		        //carrier[headX][headY] = "snakehead";//在2D資料內的紀錄蛇身
+		        //gridElems[headX][headY].className = "cover";//蛇身在UI上
+		        gridElems[headX][headY].className = "snakehead";//蛇身在UI上
+		        for(var y = 0; y < gridElems.length; y++) {
+		            for(var x = 0; x < gridElems[y].length; x++) {
+		            	if(carrier[x][y]=="cover"){
+		            		gridElems[x][y].className = "cover"; //儲存格對象=移除CSS的className[使用在建立表格實體時的指標來時做物件存取]
+		            	}
+		                
+		            }
+		        }
+
+		        gridElems[headX][headY].className = "snakehead";//蛇身在UI上
 		        len = snake.length; //返回一個陣列的長度
 		        trace(topScore, $id("score")); //最高分
 		    }
@@ -301,6 +346,7 @@
 	            }
 	            //trace("GAME OVER");
 	            //分數存檔
+	            alert(overMsg);
 	            saveScore(topScore);
 	            //document.frames('scoreiframe').location.reload();
 	            
@@ -362,7 +408,8 @@
 		    //遊戲開始
 		    function start()
 		    {//遊戲的開始
-		        len = randNum() + 1; //蛇的隨機長度[1~4]
+		        //len = randNum() + 1; //蛇的隨機長度[1~4]
+		        len = 3;
 		        if(len==0){
 		        	len = 1;
 		        }
@@ -387,7 +434,11 @@
 		        e = e || event;
 
 		        //非方向鍵、反向無效
-		        directkey = Math.abs(e.keyCode - directkey) != 2 && e.keyCode > 36 && e.keyCode < 41 ? e.keyCode : directkey; 
+		        if(chkDirect){
+		        	directkey = Math.abs(e.keyCode - directkey) != 2 && e.keyCode > 36 && e.keyCode < 41 ? e.keyCode : directkey; 
+		        	chkDirect = false;
+		        }
+		        
 
 		        return false; //停止Javascript的處理程式
 		    }
@@ -415,26 +466,30 @@
 	</head>
 
 	<body onSelectStart="return false"><!--防止滑鼠拖拉-->
-		<div id="Header">
-			<input type="hidden" name="player_id" id="player_id" value="{{$player_id}}"/>
-		</div>
-		<div id="div1" style="float:left;width:100%;height:280px;text-align:center;line-height:80px;">
-			<div id="score">0</div>		
-			<div id="say">貪食蛇</div>
-			<div id="snakeWrap"></div>
-			<div id="help">
-			    <span class="box food"></span><span>食物</span>
-			    <span class="box block"></span><span>障礙</span>
-			    <span class="box skate"></span><span>滑板</span>
-			    <span class="box brake"></span><span>刹車</span>
-			    <input type="button" class="button" id="btnStart" value="Start"/>
+		<div class="container">
+			<div class="row">
+		 	 	<div class="col-sm-6">
+		 	 		<input type="hidden" name="player_id" id="player_id" value="{{$player_id}}"/>
+					<div id="score">0</div>		
+					<div id="say">貪食蛇</div>
+					<div id="snakeWrap"></div>
+					<div id="help">
+					    <span class="box food"></span><span>食物</span>
+					    <span class="box block"></span><span>障礙</span>
+					    <span class="box skate"></span><span>滑板</span>
+					    <span class="box brake"></span><span>刹車</span>
+					    <input type="button" class="button form-control" id="btnStart" value="Start"/>
+					</div>
+					
+		 	 	</div>
+		  		<div class="col-sm-6">
+		  			<iframe allowTransparency="true" src="/www/main/page/rank" width="523px" height="580px" frameborder="0" scrolling="no" name="rankiframe" id="rankiframe"></iframe>
+		  			<br>
+		  			<iframe allowTransparency="true" src="/www/main/page/score" width="493px" height="350px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
+					<input type="button" class="btn01 form-control" value="Logout" onclick="location.href='/www/login/page/logout'" />
+		  		</div>
 			</div>
-			<iframe allowTransparency="true" src="/www/main/page/score" width="600px" height="320px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
 		</div>
-		<div id="div2" style="float:right;width:40%;height:280px;text-align:center;line-height:80px;">
-			<iframe allowTransparency="true" src="/www/main/page/rank" width="600px" height="600px" frameborder="0" scrolling="no" name="rankiframe" id="rankiframe"></iframe>
-			<input type="button" class="btn01" value="Logout" onclick="location.href='/www/login/page/logout'" />
-		</div>		
 	</body>
 
 </html>

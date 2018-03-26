@@ -63,4 +63,21 @@ class Regist_Page_Ctl extends Controller
         }
     }
 
+    public function post_ispermit(){
+
+        $sStr = Input::post('s', 'str');
+        
+        if(!(stripos($sStr,"'") === false)) return false;
+        if(!(stripos($sStr,"<") === false)) return false;
+        if(!(stripos($sStr,">") === false)) return false;
+        if(!(stripos($sStr,"delete") === false)) return false;
+        if(!(stripos($sStr,"update") === false)) return false;
+        if(!(stripos($sStr,"select") === false)) return false;
+        if(!(stripos($sStr,"create") === false)) return false;
+        if(!(stripos($sStr,"or") === false)) return false;
+        if(!(stripos($sStr,"=") === false)) return false;
+           
+        return true;
+    }
+
 }

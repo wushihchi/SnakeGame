@@ -43,6 +43,7 @@
 		{
 			var playerName = $('#playerName').val().trim();
 			var playerEmail = $('#playerEmail').val().trim();
+			//alert(playerName);
 			if(playerName==''){
 				alert('暱稱未輸入，請確認!');
 				return false;
@@ -50,11 +51,22 @@
 				if(playerName.length<4){
 					alert('暱稱最少需四個字，請確認!');
 					return false;
+				}else{
+					//alert('ispermit(playerName)='+ispermit(playerName));
+					if(!ispermit(playerName)){
+						alert('暱稱存在sql關鍵字，請重新輸入!');
+						return false;
+					}
 				}
 			}
 			if(playerEmail==''){
 				alert('Email帳號未輸入，請確認!');
 				return false;
+			}else{
+				if(!ispermit(playerEmail)){
+					alert('帳號存在sql關鍵字，請重新輸入!');
+					return false;
+				}
 			}
 
             var emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
@@ -120,6 +132,27 @@
 			return RtnVal;
 		}
 
+
+		function ispermit(istr)
+		{
+			var RtnVal = true;
+			$.ajax({
+			 	url: "/www/regist/page/ispermit",
+				method:"post",
+				async:false,
+				data: {str:istr}
+			}).done(function(result) {
+				//alert(result);
+				if (result) {
+					RtnVal = true;
+				} else {
+					RtnVal = false;
+				}
+				
+			});
+			return RtnVal;
+		}
+
 		//檢查密碼與密碼確認是否一致
 		function chkpwd()
 		{
@@ -159,44 +192,45 @@
 	</head>
 	<body>
 		<form method="post">
-			<div class="container" style="width:30%">
+			<div class="container">
 				<br><br>
-				<table class="table">
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;暱稱：<input type="text" name="playerName" id="playerName" placeholder="輸入長度4以上"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;帳號：<input type="text" name="playerEmail" id="playerEmail" placeholder="請輸入Email"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;密碼：<input type="password" name="playerPwd1" id="playerPwd1" placeholder="請輸入密碼"/>
-							<input type="hidden" name="playerPwd" id="playerPwd"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center" nowrap style="vertical-align:middle;">
-							密碼確認：<input type="password" name="playerPwd2" id="playerPwd2" placeholder="密碼確認"/>
-						</td>
-					</tr>
-					<tr>
-						<td align="center">
-							<div class="btn-group btn-group-justified">
-								<div class="btn-group">
-							 		<input type="button" class="form-control btn01" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
-							 	</div>
-							 	<div class="btn-group">
-							   	 	<input type="button" class="form-control btn01" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
-							 	</div>
-							</div>
-						</td>
-					</tr>
-				</table>
-				
+				<div class=" col-md-offset-4 col-md-4">
+					<table class="table">
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								暱稱<input type="text" class="form-control" name="playerName" id="playerName" placeholder="輸入長度4以上"/>
+							</td>
+						</tr>
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								帳號<input type="text" class="form-control" name="playerEmail" id="playerEmail" placeholder="請輸入Email"/>
+							</td>
+						</tr>
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								密碼<input type="password" class="form-control" name="playerPwd1" id="playerPwd1" placeholder="請輸入密碼"/>
+								<input type="hidden" name="playerPwd" id="playerPwd"/>
+							</td>
+						</tr>
+						<tr>
+							<td nowrap style="vertical-align:middle;">
+								密碼確認<input type="password" class="form-control" name="playerPwd2" id="playerPwd2" placeholder="密碼確認"/>
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<div class="btn-group btn-group-justified">
+									<div class="btn-group">
+								 		<input type="button" class="form-control btn01" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
+								 	</div>
+								 	<div class="btn-group">
+								   	 	<input type="button" class="form-control btn01" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
+								 	</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</form>
 	</body>

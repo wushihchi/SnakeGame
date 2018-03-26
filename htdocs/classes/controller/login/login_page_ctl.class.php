@@ -13,8 +13,12 @@ class Login_Page_Ctl extends Controller
     {
         $oModel = new Snakegame_Player_Model;
 
-        $sPlayerEmail = Input::post('s', 'playeremail');
-        $sPlayerPwd = Input::post('s', 'playerpwd');
+        $sPlayerEmail = str_replace("'", "''", Input::post('s', 'playeremail'));
+        $sPlayerPwd = str_replace("'", "''", Input::post('s', 'playerpwd'));
+
+        if(!($this->isPermit($sPlayerEmail) and $this->isPermit($sPlayerPwd))){
+            return false;
+        }
         
         $aEmailExist = $oModel->get(
             array('player_email' => $sPlayerEmail), 
@@ -54,6 +58,22 @@ class Login_Page_Ctl extends Controller
 
         $_SESSION['pagename'] = 'login';
         return Smarty_View::make('login/login.html', array('pagename' => $_SESSION['pagename']));
+    }
+
+    public function isPermit($sStr){
+        $sStr = Input::post('s', 'str');
+        
+        if(!(stripos($sStr,"'") === false)) return false;
+        if(!(stripos($sStr,"<") === false)) return false;
+        if(!(stripos($sStr,">") === false)) return false;
+        if(!(stripos($sStr,"delete") === false)) return false;
+        if(!(stripos($sStr,"update") === false)) return false;
+        if(!(stripos($sStr,"select") === false)) return false;
+        if(!(stripos($sStr,"create") === false)) return false;
+        if(!(stripos($sStr,"or") === false)) return false;
+        if(!(stripos($sStr,"=") === false)) return false;
+
+        return true;
     }
 
 }
