@@ -5,46 +5,47 @@ class Login_Page_Ctl extends Controller
     public function get_index()
     {
         session_start();
-        $_SESSION['pagename'] = 'login';
-        return Smarty_View::make('login/login.html', array('pagename' => 'login'));
+        $_SESSION['pagename']='login';
+        return Smarty_View::make('login/login.html',array('pagename'=>'login'));
     }
 
     public function post_login()
     {
-        $oModel = new Snakegame_Player_Model;
+        $oModel = new Angeldb_User_Model;
+        $sUserEmail = Input::post('s', 'userEmail');
 
-        $sPlayerEmail = str_replace("'", "''", Input::post('s', 'playeremail'));
-        $sPlayerPwd = str_replace("'", "''", Input::post('s', 'playerpwd'));
-
-        if(!($this->isPermit($sPlayerEmail) and $this->isPermit($sPlayerPwd))){
-            return false;
-        }
-        
         $aEmailExist = $oModel->get(
-            array('player_email' => $sPlayerEmail), 
-            array('field' => 'player_id')
-        );
+            array('user_email'=>$sUserEmail), 
+            array('field'=>'user_id'
+        ));
 
-        if ($aEmailExist == null) {
+        if ($aEmailExist==null) {
             unset($oModel);
+            //return '您尚未註冊，請先註冊!';
             return false;
         }
 
-        $aPlayerList = $oModel->get(
-            array('player_email' => $sPlayerEmail, 'player_pwd' => md5($sPlayerPwd)),
-            array('field' => 'player_id', 'player_nm')
+        $sUserPwd = Input::post('s', 'userPwd');
+        $sUserEmail = Input::post('s', 'userEmail');
+        $aUserList = $oModel->get(
+            array('user_email' => $sUserEmail, 'user_pwd' => md5($sUserPwd)),
+            array('field' => 'user_id', 'user_name', 'user_level')
         );
+
+        //return json_encode($aUserList);
         
-        if ($aPlayerList == null) {
+        if ($aUserList==null) {
             unset($oModel);
             //return '密碼輸入錯誤，請確認!';
             return false;
         }
 
+      
         session_start();
 
-        $_SESSION['player_id'] = $aPlayerList['player_id'];
-        $_SESSION['player_nm'] = $aPlayerList['player_nm'];
+        $_SESSION['user_id']    = $aUserList['user_id'];
+        $_SESSION['user_level'] = $aUserList['user_level'];
+        $_SESSION['user_name']  = $aUserList['user_name'];
 
         unset($oModel);
 
@@ -60,18 +61,22 @@ class Login_Page_Ctl extends Controller
         return Smarty_View::make('login/login.html', array('pagename' => $_SESSION['pagename']));
     }
 
-    public function isPermit($sStr){
-        $sStr = Input::post('s', 'str');
-        
-        if(!(stripos($sStr,"'") === false)) return false;
-        if(!(stripos($sStr,"<") === false)) return false;
-        if(!(stripos($sStr,">") === false)) return false;
-        if(!(stripos($sStr,"delete") === false)) return false;
-        if(!(stripos($sStr,"update") === false)) return false;
-        if(!(stripos($sStr,"select") === false)) return false;
-        if(!(stripos($sStr,"create") === false)) return false;
-        if(!(stripos($sStr,"or") === false)) return false;
-        if(!(stripos($sStr,"=") === false)) return false;
+    public function post_chkpermission(){
+        $oModel = new Angeldb_User_Model;
+        $sUserEmail = Input::post('s', 'userEmail');
+
+        $aUserList = $oModel->get(
+            array('user_email' => $sUserEmail),
+            array('field' => 'user_id', 'user_level')
+        );
+        //return $aUserList['user_level'];
+        if($aUserList['user_level'] == 9){
+            session_start();
+            session_destroy();
+
+            $_SESSION['pagename'] = 'login';
+            return false;
+        }
 
         return true;
     }

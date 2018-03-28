@@ -10,78 +10,90 @@
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
 		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<style>
-			body { 
-				background-image: url('/www/assets/vendor/images/green-nature.jpg');
-				background-repeat:no-repeat;
-				background-size: cover;
-				text-align:center;
-			}
-			.btn01{
-		    	font-weight:bold; 
-		    	width:95%; 
-		    	height:30px; 
-		    	background:#4CAF50; 
-		    	color:#000; 
-		    	border:1px solid #66CDAA; 
-		    	border-bottom-color:#006400; 
-		    	border-right-color:#006400; 
-		    	cursor:pointer;
-		    	text-align:center;
-		    	font-weight:bold;
-		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
-		    }
-		    table{
-		    	background:rgba(0,128,0,0.5);
-		    	color:#000000;
-		    	font-weight:bold;
-		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
-		    }
-		</style>
 		<script type="text/javascript">
 		function submit_btn()
 		{
+			if(chklogin() == false){
+				alert('Email帳號或密碼輸入不正確,請確認!!');
+				return false;
+			}
+
+			if(chkPermission() == false){
+				alert('帳號已停用,請洽管理人員!');
+				return false;
+			}
+
+			location.href='/www/msg/list/msglist';
+			
+		}
+
+		function chklogin(){
+			var rtnVal;
+
 			$.ajax({
 			 	url: "/www/login/page/login",
 				method:"post",
+				cache:false,
 				async:false,
-				data: {playeremail:$('#playerEmail').val(),playerpwd:$('#playerPwd').val()}
+				data: {userEmail:$('#userEmail').val(),userPwd:$('#userPwd').val()}
 			}).done(function(result){
+				//alert(result);
 				if(result){
-					location.href='/www/main/page';
+					rtnVal = true;
 				}else{
-					alert('Email帳號或密碼輸入不正確,請確認!!');
-					return false;
+					rtnVal = false;
 				}
 			});
-			
+
+			return rtnVal;
+		}
+
+		function chkPermission()
+		{
+			var rtnVal;
+			$.ajax({
+			 	url: "/www/login/page/chkpermission",
+				method:"post",
+				cache:false,
+				async:false,
+				data: {userEmail:$('#userEmail').val()}
+			}).done(function(result){
+				//alert(result);
+				if(result){
+					rtnVal = true;
+				}else{
+					rtnVal = false;
+				}
+			});
+
+			return rtnVal;
 		}
 		</script>
 	</head>
 	<body>
 		<form method="post" name="loginForm" id="loginForm">
-			<div class="container" >
+			<div class="container">
 				<br><br>
-				<div class=" col-md-offset-4 col-md-4">
+				<div class="col-md-offset-4 col-md-4">
 					<table class="table">
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								帳號<input type="text" class="form-control" name="playerEmail" id="playerEmail" size="18" placeholder="Email帳號"/>
+							<td nowrap>
+								Email帳號<input type="text" class="form-control" name="userEmail" id="userEmail" placeholder="Email帳號"/>
 							</td>
 						</tr>
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								密碼<input type="password" class="form-control" name="playerPwd" id="playerPwd" size="18" placeholder="密碼"/>
+							<td nowrap>
+								密碼<input type="password" class="form-control" name="userPwd" id="userPwd" placeholder="密碼"/>
 							</td>
 						</tr>
 						<tr>
 							<td align="center">
 								<div class="btn-group btn-group-justified">
 								   	<div class="btn-group">
-								   	 	<input type="button" class="form-control btn01" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
+								   	 	<input type="button" class="form-control btn-primary" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
 								 	</div>
 								 	<div class="btn-group">
-								    	<input type="button" class="form-control btn01" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
+								    	<input type="button" class="form-control btn-primary" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
 									</div>
 								</div>
 							</td>

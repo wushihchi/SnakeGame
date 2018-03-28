@@ -1,0 +1,461 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+
+		<script type="text/javascript">
+		function submintClick()
+		{
+			var UserId = $('#UserId').val().trim();
+			var Msg_Content = $('#Msg_Content').val().trim();
+
+			if(Msg_Content==''){
+				alert('留言內容不得為空值,請確認!');
+				return false;
+			}else{
+				if(chk(Msg_Content)){
+					add_click(UserId,Msg_Content);
+				}else{
+					alert("包含特殊字元,請修正!"); 
+					return false;
+				}
+			}
+		}
+
+		function chk(str)
+		{
+			var pass = true;
+			var ch;
+			var stralarm = new Array("<",">");
+			for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
+				for (var j=0;j<str.length;j++){
+					ch=str.substr(j,1);
+					if (ch==stralarm[i]){
+						//如果包含禁止字元
+						pass = false; //設置此變數為true
+					}
+				} 
+			}
+			return pass;
+		}
+
+		function add_click(iUsrId,iMsgContent)
+		{
+			if(confirm('確定新增以下內容?\n'+iMsgContent)){
+				$.ajax({
+				  url: "/www/msg/list/insert",
+				  method:"post",
+				  data: {user_id:iUsrId,msgcontent:iMsgContent}
+				}).done(function(result) {
+					//alert(result);
+					if(result){
+						location.reload();
+					}else{
+						alert('error');
+						return false;
+					}
+					
+				});
+			}else{
+				return false;
+			}
+			
+		}
+
+		function reply_click(iUsrId,iUserName,iPMsgId){
+
+			$('#reply_user_id').val(iUsrId);
+			$('#pmsg_id').val(iPMsgId);
+			$('#reply_user_name').text(iUserName);
+			
+		}
+
+		function reply_submit(){
+
+			var MsgContent = $('#reply_content').val();
+			var UsrId = $('#reply_user_id').val();
+			var PMsgId = $('#pmsg_id').val();
+
+			if(confirm('確定回覆以下內容?\n'+MsgContent)){
+				$.ajax({
+				  	url: "/www/msg/list/insert",
+				  	method:"post",
+				  	data: {user_id:UsrId,msgcontent:MsgContent,pmsg_id:PMsgId}
+				}).done(function(result) {
+					//alert(result);
+					if(result){
+						location.href='/www/msg/list/msglist';
+					}else{
+						alert('error');
+						return false;
+					}
+					
+				});
+			}else{
+				return false;
+			}
+						
+		}
+
+		function del_click(iMsgId)
+		{
+			if (confirm('確認刪除嗎?')) {
+				$.ajax({
+				    url: "/www/msg/list/delete",
+				    method:"post",
+				    data: {msg_id:iMsgId}
+				}).done(function(result){
+					if(result){
+						location.reload();
+					}else{
+						alert('error');
+						return false;
+					}
+					
+				});
+			} else {
+				return false;
+			}
+			
+		}
+
+		function edit_click(iUserName,iMsgContent,iMsgId)
+		{
+			$('#edit_user').text(iUserName);
+			$('#edit_content').text(iMsgContent);
+			$('#edit_aid').val(iMsgId);
+		}
+
+		function edit_submit()
+		{
+			var edit_content = $('#edit_content').val();
+			if(!chk(edit_content)){
+				alert("包含特殊字元,請修正!");
+				return false;
+			}
+
+			if(confirm('確定修改為以下內容?\n'+edit_content)){
+				var edit_aid = $('#edit_aid').val();
+         		$.ajax({
+				  	url: "/www/msg/list/update",
+				  	method:"post",
+				  	data: {msg_id:edit_aid,msgcontent:edit_content}
+				}).done(function(result) {
+					if(result){
+						location.reload();
+					}else{
+						alert('error');
+						return false;
+					}
+					
+				});
+			}else{
+				return false;
+			}
+			
+		}
+
+		function changePage(iPage)
+		{
+			$.ajax({
+			  	url: "/www/msg/list/changepage",
+			  	method:"post",
+			  	data: {page:iPage}
+			}).done(function(result) {
+				if(result){
+					location.href='/www/msg/list/msglist';
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		</script>
+		<title>留言板</title>
+		<style type="text/css">
+	        .box{
+	     		border-radius: 10px;
+			}
+			.box-blue{
+				border: #CDDBE0 1px solid;
+				background-color: #E3F5FC;
+				color: #2D5666;
+				font-family: '微軟正黑體';
+			}
+			.box-gray{
+				border: #CCCCCC 1px solid;
+				background-color: #F2F2F2;
+				color: #4D4D4D;
+				font-family: '微軟正黑體';
+			}
+
+			.ui-icon { 
+			    zoom: 125%; 
+			    -moz-transform: scale(1.25); 
+			    -webkit-zoom: 1.25; 
+			    -ms-zoom: 1.25;
+			}
+			.reply{
+				margin-left:10px;
+			}
+		</style> 
+	</head>
+	<body>
+		<form method="post" action="n_msg.php" name="msgForm" id="msgForm">
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+				<div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      	<div class="modal-header">
+				       	 	<h4 class="modal-title" id="myModalLabel">編輯留言內容</h4>
+				      	</div>
+				    	<div class="modal-body">
+				        	<table class="table table-striped">
+								<tr>
+									<td align="right" nowrap>暱稱:</td>
+									<td align="left">
+										<span name="edit_user" id="edit_user"></span>
+										<input type="hidden" name="edit_aid" id="edit_aid"/>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" nowrap>內容:</td>
+									<td align="left"><textarea class="form-control" name="edit_content" id="edit_content"></textarea></td>
+								</tr>
+							</table>
+				    	</div>
+				    	<div class="modal-footer">
+				        	<button type="button" class="btn btn-primary" onclick="edit_submit();">確認</button>
+				        	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+				      	</div>
+				    </div>
+				</div>
+			</div>
+			<div class="modal fade" id="replyModal" tabindex="-1" role="dialog" aria-labelledby="replyModalLabel">
+				<div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      	<div class="modal-header">
+				       	 	<h4 class="modal-title" id="replyModalLabel">留言回覆</h4>
+				      	</div>
+				    	<div class="modal-body">
+				        	<table class="table table-striped">
+								<tr>
+									<td align="right" nowrap>回覆對象:</td>
+									<td align="left">
+										<span name="reply_user_name" id="reply_user_name"></span>
+										<input type="hidden" name="reply_user_id" id="reply_user_id"/>
+										<input type="hidden" name="pmsg_id" id="pmsg_id"/>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" nowrap>內容:</td>
+									<td align="left"><textarea class="form-control" name="reply_content" id="reply_content"></textarea></td>
+								</tr>
+							</table>
+				    	</div>
+				    	<div class="modal-footer">
+				        	<button type="button" class="btn btn-primary" onclick="reply_submit();">確認</button>
+				        	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+				      	</div>
+				    </div>
+				</div>
+			</div>
+			<div class="container">
+				<nav class="navbar navbar-default" role="navigation">
+				   	<div class="container-fluid">
+				       	<!-- Brand and toggle get grouped for better mobile display -->
+						<div class="navbar-header">
+				           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+				data-target="#bs-example-navbar-collapse-1" >
+				               <span class="sr-only">Toggle navigation</span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				           	</button>
+				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
+				       </div>
+
+				       <!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				           	<ul class="nav navbar-nav">
+				               <li class="active"><a href="/www/msg/list/msglist">MessageBoard</a></li>
+				               {{if ($session_level==0||$session_level==3)}}
+				               <li><a href="/www/user/list/userlist">UserPage</a></li>
+				               {{/if}}
+				               <li><a href="/www/main/page">Snakegame</a></li>
+				           	</ul>
+				           	<div align="right" style="margin-top:20px;">Hi,{{$session_name}} (
+				           		<font style="color:#A9A9A9; ">
+								{{if ($session_level)==0}}
+								    最高權限
+								{{elseif ($session_level)==3}}
+									管理者
+								{{elseif ($session_level)==5}}
+									一般使用者
+								{{elseif ($session_level)==9}}
+									停權中
+								{{/if}}
+								</font>
+				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
+				       	</div><!-- /.navbar-collapse -->
+					</div>
+				   	<!-- /.container-fluid -->
+				</nav>
+				{{if ($session_id!='')}}
+				<table class="table table-striped">
+					<tr>
+						<td align="right" nowrap>暱稱:</td>
+						<td align="left">
+							{{$session_name}}
+							<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" nowrap>內容:</td>
+						<td align="left"><textarea class="form-control" name="Msg_Content" id="Msg_Content"></textarea></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="right">
+							<input type="button" class="form-control btn-primary" name="submit_btn" id="submit_btn" value="送出" onclick="submintClick();"/>
+						</td>
+					</tr>
+				</table>
+				<br>
+				{{/if}}
+				<!--分頁處理Start-->
+				<ul class="pagination">
+					{{if ($page==1)}}
+						{{$prePage=1}}
+					{{else}}
+						{{$prePage=$page-1}}
+					{{/if}}
+					{{if ($page==$pagecnt)}}
+						{{$nextPage=$pagecnt}}
+					{{else}}
+						{{$nextPage=$page+1}}
+					{{/if}}
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					{{for $idx=1 to $pagecnt}}
+					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+					{{/for}}
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+				</ul>
+				<!--分頁處理End-->
+				<table class="table img-rounded">
+					{{foreach from=$msglist item=item}}
+						{{if $item.user_id==$session_id}}
+						{{$className='box box-blue'}}
+						{{else}}
+						{{$className='box box-gray'}}
+						{{/if}}
+					<tr >
+						<td align="left" {{$bgColor}} class="{{$className}}" style="border: 0px;">
+							<font style="font-size:20px;font-weight:bold;">
+							{{if ($item.user_id==0)}}
+							使用者已刪除
+							{{else}}
+							{{$item.user_name}}
+							{{/if}}
+                            </font>
+							{{if ($session_id==$item.user_id)}}
+							<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','{{$item.msg_content}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+							{{/if}}
+							{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
+							<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+							{{/if}}
+							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
+							<br>
+							<font style="font-size:10px;color:#A9A9A9;">
+							{{if ($item.user_level)==0}}
+							    最高權限
+							{{elseif ($item.user_level)==3}}
+								管理者
+							{{elseif ($item.user_level)==5}}
+								一般使用者
+							{{elseif ($item.user_level)==9}}
+								停權中
+							{{/if}}
+							</font><br>
+							<font style="font-size:16px;">{{$item.msg_content}}</font><br><br>
+							<font style="font-size:10px;">{{$item.msg_dtm}}</font>
+							<br>
+							{{foreach from=$replymsglist item=replyitem}}
+								{{if $replyitem.pmsg_id==$item.msg_id}}
+									{{if $replyitem.user_id==$session_id}}
+									{{$replyclassName='box box-blue'}}
+									{{else}}
+									{{$replyclassName='box box-gray'}}
+									{{/if}}
+									<br>
+									<div class="{{$replyclassName}}" style="margin-left:50px;">
+									    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
+									    {{if ($session_id==$replyitem.user_id)}}
+									    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+									    {{/if}}
+									    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
+									    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+									    {{/if}}
+									    <br>
+									    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">
+										{{if ($replyitem.user_level)==0}}
+										    最高權限
+										{{elseif ($replyitem.user_level)==3}}
+											管理者
+										{{elseif ($replyitem.user_level)==5}}
+											一般使用者
+										{{elseif ($replyitem.user_level)==9}}
+											停權中
+										{{/if}}
+										</font>
+										<br>
+									    <font class="reply" style="font-size:14px;">{{$replyitem.msg_content}}</font><br><br>
+										<font class="reply" style="font-size:8px;">{{$replyitem.msg_dtm}}</font>
+									</div>
+								{{/if}}
+							{{/foreach}}
+						</td>
+					</tr>
+					<tr>
+						<td style="border: 0px;"> </td>
+					</tr>
+					{{/foreach}}
+				</table>
+				<!--分頁處理Start-->
+				<ul class="pagination">
+					{{if ($page==1)}}
+						{{$prePage=1}}
+					{{else}}
+						{{$prePage=$page-1}}
+					{{/if}}
+					{{if ($page==$pagecnt)}}
+						{{$nextPage=$pagecnt}}
+					{{else}}
+						{{$nextPage=$page+1}}
+					{{/if}}
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					{{for $idx=1 to $pagecnt}}
+					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+					{{/for}}
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+				</ul>
+				<!--分頁處理End-->
+			</div>
+		</form>
+	</body>
+</html>
+

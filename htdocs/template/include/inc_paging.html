@@ -1,0 +1,17 @@
+<ul class="pagination">
+  {{if ($page==1)}}
+    {{$prePage=1}}
+  {{else}}
+    {{$prePage=$page-1}}
+  {{/if}}
+  {{if ($page==$pagecnt)}}
+    {{$nextPage=$pagecnt}}
+  {{else}}
+    {{$nextPage=$page+1}}
+  {{/if}}
+  <li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+  {{for $idx=1 to $pagecnt}}
+  <li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+  {{/for}}
+  <li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+</ul>

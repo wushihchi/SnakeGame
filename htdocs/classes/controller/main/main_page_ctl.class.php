@@ -5,10 +5,10 @@ class Main_Page_Ctl extends Controller
     public function get_index()
     {
         if ($this->chkSession()) {
-            //取得最高分
+            //取得最高分           
             $oModel = new Snakegame_Score_Model;
             
-            $aScoreList = $oModel->find(array('player_id' => $_SESSION['player_id']), array(
+            $aScoreList = $oModel->find(array('player_id' => $_SESSION['user_id']), array(
                 'field' => 'score_id, score,player_id,play_dtm',
                 'limit' => '10',
                 'order' => 'score desc'
@@ -17,12 +17,30 @@ class Main_Page_Ctl extends Controller
             //return json_encode($aScoreList);
             unset($oModel);
 
-            return Smarty_View::make('main/main.html', array(
-                'scorelist'      => $aScoreList,
-                'player_id'      => $_SESSION['player_id'],
-                'player_nm'      => $_SESSION['player_nm']
+            return Smarty_View::make('main/mainframe.html', array(
+                'scorelist'  => $aScoreList,
+                'user_id'    => $_SESSION['user_id'],
+                'user_name'  => $_SESSION['user_name'],
+                'user_level' => $_SESSION['user_level']
             ));
-            //return Smarty_View::make('main/main1.html', array('pagename'=>$_SESSION['pagename'],'player_id'=>$_SESSION['player_id'],'player_nm'=>$_SESSION['player_nm']));
+            //return Smarty_View::make('main/mainframe.html', array('pagename'=>$_SESSION['pagename'],'player_id'=>$_SESSION['player_id'],'player_nm'=>$_SESSION['player_nm']));
+        } else {
+            return Smarty_View::make('login/login.html');
+        }
+
+
+       
+    }
+
+    public function get_iframepage()
+    {
+
+        if ($this->chkSession()) {
+            return Smarty_View::make('main/main.html', array(
+                'pagename'  => $_SESSION['pagename'],
+                'user_id'   => $_SESSION['user_id'],
+                'user_name' => $_SESSION['user_name'])
+        );
         } else {
             return Smarty_View::make('login/login.html');
         }
@@ -35,19 +53,16 @@ class Main_Page_Ctl extends Controller
          if ($this->chkSession()) {
             //取得最高分
             $oModel = new Snakegame_Score_Model;
-            
-            $aScoreList = $oModel->find(array('player_id' => $_SESSION['player_id']), array(
+           
+            $aScoreList = $oModel->find(array('player_id' => $_SESSION['user_id']), array(
                 'field' => 'score_id, score,player_id,play_dtm',
                 'limit' => '5',
                 'order' => 'score desc'
             ));
 
-            $iTopScore = $aScoreList[0]['score'];
-            
-            //return json_encode($aScoreList);
             unset($oModel);
 
-            return Smarty_View::make('main/score.html', array('scorelist'=> $aScoreList,'topscore'=> $iTopScore));
+            return Smarty_View::make('main/score.html', array('scorelist'=> $aScoreList,'topscore' => $iTopScore));
         } else {
             return Smarty_View::make('login/login.html');
         }
@@ -66,33 +81,32 @@ class Main_Page_Ctl extends Controller
                 'order' => 'score desc'
             ));
 
-            $oPlayerModel = new Snakegame_Player_Model;
+            //$oPlayerModel = new Snakegame_Player_Model;
+            $oUserModel = new Angeldb_User_Model;
 
             $aPlayerAry = $oModel->find_col('player_id', array(), array('field' => 'player_id'));
-            $aPlayerList = $oPlayerModel->find_pair(
-                'player_id',
-                'player_nm',
-                array('player_id'=>$aPlayerAry),
+            $aPlayerList = $oUserModel->find_pair(
+                'user_id',
+                'user_name',
+                array('user_id'=> $aPlayerAry),
                 array()
             );
 
-            //$temp = $this->maskString("star");
-            //return $temp;
-            
             foreach ($aScoreList as $iKey => $aValue) {
                 $sTempPlayerNm = $aPlayerList[$aScoreList[$iKey]['player_id']];
-                if ($aScoreList[$iKey]['player_id'] != $_SESSION['player_id']) {
+                if ($aScoreList[$iKey]['player_id'] != $_SESSION['user_id']) {
                     $sTempPlayerNm = $this->maskString($sTempPlayerNm);
                 }
-                $aScoreList[$iKey]['player_nm'] = $sTempPlayerNm;                
+                $aScoreList[$iKey]['user_name'] = $sTempPlayerNm;                
             }
 
+            //return json_encode($aScoreList);
             unset($oModel);
-
+   
             return Smarty_View::make('main/rank.html', array(
                 'scorelist' => $aScoreList,
                 'topscore'  => $iTopScore,
-                'player_id' => $_SESSION['player_id']
+                'user_id'   => $_SESSION['user_id']
             ));
 
         } else {
@@ -109,7 +123,7 @@ class Main_Page_Ctl extends Controller
         $primary_key = $oModel->insert(array(
             'score'     => $iScore,
             'player_id' => $sPlayerId,
-            'play_dtm'  => date ("Y-m-d H:i:s", mktime(date('H')+7, date('i'), date('s'), date('m'), date('d'), date('Y'))),
+            'play_dtm'  => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
         ));
 
         unset($oModel);
@@ -118,14 +132,17 @@ class Main_Page_Ctl extends Controller
         }
     }
 
+
     private function chkSession()
     {
         session_start();
-        if ($_SESSION['player_id'] == '') {
-            $_SESSION['pagename'] = 'main';
 
+        if ($_SESSION['user_id']=='') {
+            $_SESSION['pagename'] = 'login';
             return false;
         } else {
+            $_SESSION['pagename'] ='main';
+            
             return true;
         }
     }

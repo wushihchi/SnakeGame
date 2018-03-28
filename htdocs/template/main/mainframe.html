@@ -1,0 +1,191 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+		<script type="text/javascript">
+		function submintClick()
+		{
+			var UserId = $('#UserId').val().trim();
+			var Msg_Content = $('#Msg_Content').val().trim();
+
+			if(Msg_Content==''){
+				alert('留言內容不得為空值,請確認!');
+				return false;
+			}else{
+				if(chk(Msg_Content)){
+					add_click(UserId,Msg_Content);
+				}else{
+					alert("包含特殊字元,請修正!"); 
+					return false;
+				}
+			}
+		}
+
+		function chk(str)
+		{
+			var pass = true;
+			var ch;
+			var stralarm = new Array("<",">");
+			for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
+				for (var j=0;j<str.length;j++){
+					ch=str.substr(j,1);
+					if (ch==stralarm[i]){
+						//如果包含禁止字元
+						pass = false; //設置此變數為true
+					}
+				} 
+			}
+			return pass;
+		}
+
+		function add_click(iUsrId,iMsgContent)
+		{
+			$.ajax({
+			  url: "/www/msg/list/insert",
+			  method:"post",
+			  data: {sUsrId:iUsrId,sMsgContent:iMsgContent}
+			}).done(function(result) {
+				//alert('result='+result);
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		function del_click(iMsgId)
+		{
+			$.ajax({
+			  url: "/www/msg/list/delete",
+			  method:"post",
+			  data: {sMsgId:iMsgId}
+			}).done(function(result){
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		function edit_click(iUserId,iMsgContent,iMsgId)
+		{
+			$('#edit_user').text(iUserId);
+			$('#edit_content').text(iMsgContent);
+			$('#edit_aid').val(iMsgId);
+		}
+
+		function edit_submit()
+		{
+			var edit_content = $('#edit_content').val();
+			if(chk(edit_content)){
+				var edit_aid = $('#edit_aid').val();
+         		$.ajax({
+				  	url: "/www/msg/list/update",
+				  	method:"post",
+				  	data: {sMsgId:edit_aid,sMsgContent:edit_content}
+				}).done(function(result) {
+					if(result){
+						location.reload();
+					}else{
+						alert('error');
+						return false;
+					}
+					
+				});
+			}else{
+				alert("包含特殊字元,請修正!");
+				return false;
+			}
+			
+		}
+
+		function changePage(iPage)
+		{
+			$.ajax({
+			  	url: "/www/msg/list/changepage",
+			  	method:"post",
+			  	data: {page:iPage}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		</script>
+		<title>貪食蛇</title>
+	</head>
+	<body>
+		<form method="post" action="n_msg.php" name="msgForm" id="msgForm">
+			<div class="container">
+				<nav class="navbar navbar-default" role="navigation">
+				   	<div class="container-fluid">
+				       	<!-- Brand and toggle get grouped for better mobile display -->
+						<div class="navbar-header">
+				           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+				data-target="#bs-example-navbar-collapse-1" >
+				               <span class="sr-only">Toggle navigation</span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				           	</button>
+				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
+				       </div>
+
+				       <!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				           	<ul class="nav navbar-nav">
+				               <li><a href="/www/msg/list/msglist">MessageBoard</a></li>
+				               {{if ($user_level==0 || $user_level==3)}}
+				               <li><a href="/www/user/list/userlist">UserPage</a></li>
+				               {{/if}}
+				               <li class="active"><a href="/www/main/page">Snakegame</a></li>
+				               <li></li>
+				           	</ul>
+				           	<div align="right" style="margin-top:20px;">Hi,{{$user_name}} (
+				           		<font style="color:#A9A9A9; ">
+								{{if ($user_level)==0}}
+								    最高權限
+								{{elseif ($user_level)==3}}
+									管理者
+								{{elseif ($user_level)==5}}
+									一般使用者
+								{{elseif ($user_level)==9}}
+									停權中
+								{{/if}}
+								</font>
+				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
+				           	
+				       	</div><!-- /.navbar-collapse -->
+					</div>
+				   	<!-- /.container-fluid -->
+				</nav>
+				<iframe src="/www/main/page/iframepage" width="100%" height="92%"></iframe>
+			</div>
+		</form>
+	</body>
+</html>
+

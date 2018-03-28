@@ -53,9 +53,9 @@
 					</tr>
 					{{foreach from=$scorelist item=item}}
 					{{$idx=$idx+1}}
-					<tr {{if ($item.player_id==$player_id)}}style="background:rgba(255,255,0,0.6);"{{/if}}>
+					<tr {{if ($item.user_id==$user_id)}}style="background:rgba(255,255,0,0.6);"{{/if}}>
 						<td align="cneter" nowrap><strong><font class="text">{{$idx}}</font></strong></td>
-						<td align="cneter" nowrap><strong><font class="text">{{$item.player_nm}}</font></strong></td>
+						<td align="cneter" nowrap><strong><font class="text">{{$item.user_name}}</font></strong></td>
 						<td align="cneter" nowrap><strong><font class="text">{{$item.score}}</font></strong></td>
 						<td align="cneter" nowrap><strong><font class="text">{{$item.play_dtm}}</font></strong></td>
 					</tr>

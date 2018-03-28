@@ -10,100 +10,71 @@
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
 		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<style>
-			body { 
-				background-image: url('/www/assets/vendor/images/green-nature.jpg');
-				background-repeat:no-repeat;
-				background-size: cover;
-				text-align:center;
-			}
-			table{
-				background:rgba(0,128,0,0.5);
-				color:#000000;
-				font-weight:bold;
-				text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
-			}
-			.btn01{
-		    	font-weight:bold; 
-		    	width:95%; 
-		    	height:30px; 
-		    	background:#4CAF50; 
-		    	color:#000; 
-		    	border:1px solid #66CDAA; 
-		    	border-bottom-color:#006400; 
-		    	border-right-color:#006400; 
-		    	cursor:pointer;
-		    	text-align:center;
-		    	font-weight:bold;
-		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
-		    }
-		</style>
 		<script type="text/javascript">
 		function submitFunc()
 		{
-			var playerName = $('#playerName').val().trim();
-			var playerEmail = $('#playerEmail').val().trim();
-			//alert(playerName);
-			if(playerName==''){
+			var userName = $('#userName').val().trim();
+			var userEmail = $('#userEmail').val().trim();
+			
+			//=====暱稱檢查=====Start
+			if(userName==''){
 				alert('暱稱未輸入，請確認!');
 				return false;
-			}else{
-				if(playerName.length<4){
-					alert('暱稱最少需四個字，請確認!');
-					return false;
-				}else{
-					//alert('ispermit(playerName)='+ispermit(playerName));
-					if(!ispermit(playerName)){
-						alert('暱稱存在sql關鍵字，請重新輸入!');
-						return false;
-					}
-				}
 			}
-			if(playerEmail==''){
+			if(!ispermit(userName)){
+				alert('暱稱存在sql關鍵字，請重新輸入!');
+				return false;
+			}
+			if(userName.length<4){
+				alert('暱稱最少需四個字，請確認!');
+				return false;
+			}
+			if (!chkNameExist(userName)) {
+				alert('暱稱已存在,請重新輸入!');
+				return false;
+			}
+			//=====暱稱檢查=====End
+
+			//=====Email帳號檢查=====Start
+			if(userEmail==''){
 				alert('Email帳號未輸入，請確認!');
 				return false;
-			}else{
-				if(!ispermit(playerEmail)){
-					alert('帳號存在sql關鍵字，請重新輸入!');
-					return false;
-				}
 			}
-
+			if(!ispermit(userEmail)){
+				alert('Email帳號存在sql關鍵字，請重新輸入!');
+				return false;
+			}
             var emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
 
-			if (playerEmail.search(emailRule)== -1) {
+			if (userEmail.search(emailRule)== -1) {
 				alert('Email格式錯誤,請確認!!');
 				return false;
 			}
-
-			if (!chkEmailExist(playerEmail)) {
+			if (!chkEmailExist(userEmail)) {
 				alert('Email已存在,請重新輸入!');
 				return false;
 			}
-
-			if (!chkNameExist(playerName)) {
-				alert('暱稱已存在!!!!,請重新輸入!');
-				return false;
-			}
+			//=====Email帳號檢查=====End
 
 			if (!chkpwd()) {
 				return false;
 			}
+
 			
-			var playerPwd = $('#playerPwd').val();
-			regist_func(playerName,playerEmail,playerPwd);
+			var userPwd = $('#userPwd').val();
+			regist_func(userName,userEmail,userPwd);
 
 		}
 
-		function chkEmailExist(iplayerEmail)
-		{
+		function chkEmailExist(iuserEmail){
 			var RtnVal = true;
 			$.ajax({
 			 	url: "/www/regist/page/checkemailexist",
 				method:"post",
 				async:false,
-				data: {playeremail:iplayerEmail}
+				data: {userEmail:iuserEmail}
 			}).done(function(result) {
+
 				if (result) {
 					RtnVal = true;
 				} else {
@@ -114,14 +85,13 @@
 			return RtnVal;
 		}
 
-		//檢查暱稱是否已存在
-		function chkNameExist(iplayerNm){
+		function chkNameExist(iuserName){
 			var RtnVal = true;
 			$.ajax({
 			 	url: "/www/regist/page/checknameexist",
 				method:"post",
 				async:false,
-				data: {playernm:iplayerNm}
+				data: {userName:iuserName}
 			}).done(function(result) {
 				if (result) {
 					RtnVal = true;
@@ -132,7 +102,6 @@
 			return RtnVal;
 		}
 
-
 		function ispermit(istr)
 		{
 			var RtnVal = true;
@@ -142,7 +111,6 @@
 				async:false,
 				data: {str:istr}
 			}).done(function(result) {
-				//alert(result);
 				if (result) {
 					RtnVal = true;
 				} else {
@@ -156,27 +124,27 @@
 		//檢查密碼與密碼確認是否一致
 		function chkpwd()
 		{
-			if($('#playerPwd1').val().trim()==''||$('#playerPwd2').val().trim()==''){
+			if($('#userPwd1').val().trim()==''||$('#userPwd2').val().trim()==''){
 				alert('密碼與確認密碼皆須輸入，請確認!');
 				return false;
 			}else{
-				if($('#playerPwd1').val()!=$('#playerPwd2').val()){
+				if($('#userPwd1').val()!=$('#userPwd2').val()){
 					alert('密碼與確認密碼輸入不一致，請確認!');
 					return false;
 				}else{
-					$('#playerPwd').val($('#playerPwd1').val());
+					$('#userPwd').val($('#userPwd1').val());
 					return true;
 				}
 			}
 			
 		}
 
-		function regist_func(iPlayerNm,iPlayerEmail,iPlayerPwd)
+		function regist_func(iUserName,iUserEmail,iUserPwd)
 		{
 			$.ajax({
 			    url: "/www/regist/page/insert",
 			    method:"post",
-			    data: {playernm:iPlayerNm,playeremail:iPlayerEmail,playerpwd:iPlayerPwd}
+			    data: {UserName:iUserName,UserEmail:iUserEmail,UserPwd:iUserPwd}
 			}).done(function(result) {
 				//alert(result);
 				if(result){
@@ -191,40 +159,40 @@
 		</script>
 	</head>
 	<body>
-		<form method="post">
+		<form method="post" name="registForm" id="registForm">
 			<div class="container">
 				<br><br>
-				<div class=" col-md-offset-4 col-md-4">
+				<div class="col-md-offset-4 col-md-4">
 					<table class="table">
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								暱稱<input type="text" class="form-control" name="playerName" id="playerName" placeholder="輸入長度4以上"/>
+							<td nowrap>
+								暱稱<input type="text" class="form-control" placeholder="輸入長度4以上" name="userName" id="userName"/>
 							</td>
 						</tr>
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								帳號<input type="text" class="form-control" name="playerEmail" id="playerEmail" placeholder="請輸入Email"/>
+							<td nowrap>
+								Email帳號<input type="text" class="form-control" placeholder="請輸入Email" name="userEmail" id="userEmail"/>
 							</td>
 						</tr>
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								密碼<input type="password" class="form-control" name="playerPwd1" id="playerPwd1" placeholder="請輸入密碼"/>
-								<input type="hidden" name="playerPwd" id="playerPwd"/>
+							<td nowrap>
+								密碼<input type="password" class="form-control" placeholder="請輸入密碼" name="userPwd1" id="userPwd1"/>
+								<input type="hidden" name="userPwd" id="userPwd"/>
 							</td>
 						</tr>
 						<tr>
-							<td nowrap style="vertical-align:middle;">
-								密碼確認<input type="password" class="form-control" name="playerPwd2" id="playerPwd2" placeholder="密碼確認"/>
+							<td nowrap>
+								密碼確認<input type="password" class="form-control" placeholder="密碼確認" name="userPwd2" id="userPwd2"/>
 							</td>
 						</tr>
 						<tr>
 							<td align="center">
 								<div class="btn-group btn-group-justified">
 									<div class="btn-group">
-								 		<input type="button" class="form-control btn01" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
+								 		<input type="button" class="form-control btn-primary" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
 								 	</div>
 								 	<div class="btn-group">
-								   	 	<input type="button" class="form-control btn01" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
+								   	 	<input type="button" class="form-control btn-primary" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
 								 	</div>
 								</div>
 							</td>

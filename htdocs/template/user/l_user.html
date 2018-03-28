@@ -1,0 +1,288 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
+		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+		<script type="text/javascript">
+		function del_click(iUserId)
+		{
+			$.ajax({
+			  url: "/www/user/list/delete",
+			  method:"post",
+			  data: {UserId:iUserId}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		function disable_click(iUserId)
+		{
+			$.ajax({
+			  url: "/www/user/list/disable",
+			  method:"post",
+			  data: {UserId:iUserId}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		function enable_click(iUserId)
+		{
+			$.ajax({
+			  url: "/www/user/list/enable",
+			  method:"post",
+			  data: {UserId:iUserId}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+				
+			});
+		}
+
+		function edit_click(iUserId,iUsername,iUserLevel)
+		{
+			if(iUserLevel==3){
+				$("#edit_level").prop("checked",true);
+			}else{
+				$("#edit_level").prop("checked",false);
+			}
+			$('#edit_username').text(iUsername);
+			//$('#edit_content').text(iUserLevel);
+			$('#edit_userid').val(iUserId);
+		}
+
+		function edit_submit()
+		{
+			var edit_level = 0;
+			if($("#edit_level").prop('checked')){
+				edit_level = 3;
+			}else{
+				edit_level = 5;
+			}
+			var edit_aid = $('#edit_userid').val();
+     		$.ajax({
+			  	url: "/www/user/list/update",
+			  	method:"post",
+			  	data: {UserId:edit_aid,UserLevel:edit_level}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+			});
+		}
+
+		function changePage(iPage)
+		{
+			$.ajax({
+			  	url: "/www/user/list/changepage",
+			  	method:"post",
+			  	data: {page:iPage}
+			}).done(function(result) {
+				if(result){
+					location.reload();
+				}else{
+					alert('error');
+					return false;
+				}
+			});
+		}
+
+		</script>
+		<title>使用者管理</title>
+	</head>
+	<body>
+		<form method="post" name="userForm" id="userForm">
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+				<div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      	<div class="modal-header">
+				       	 	<h4 class="modal-title" id="myModalLabel">權限管理</h4>
+				      	</div>
+				    	<div class="modal-body">
+				        	<table class="table table-striped">
+								<tr>
+									<td align="right" nowrap><span name="edit_username" id="edit_username"></span></td>
+									<td align="left">
+										<input type="hidden" name="edit_userid" id="edit_userid"/>
+										<label for="user_level"><input type="checkbox" name="edit_level" id="edit_level" value="1"/>管理者權限</label>
+									</td>
+								</tr>
+							</table>
+				    	</div>
+				    	<div class="modal-footer">
+				        	<button type="button" class="btn btn-primary" onclick="edit_submit();">確認</button>
+				        	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+				      	</div>
+				    </div>
+				</div>
+			</div>
+
+			<div class="container">
+				<nav class="navbar navbar-default" role="navigation">
+				   	<div class="container-fluid">
+				       	<!-- Brand and toggle get grouped for better mobile display -->
+						<div class="navbar-header">
+				           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+				data-target="#bs-example-navbar-collapse-1" >
+				               <span class="sr-only">Toggle navigation</span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				               <span class="icon-bar"></span>
+				           	</button>
+				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
+				       </div>
+
+				       <!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				           	<ul class="nav navbar-nav">
+				               <li ><a href="/www/msg/list/msglist">MessageBoard</a></li>
+				               {{if ($session_level==0||$session_level==3)}}
+				               <li class="active"><a href="/www/user/list/userlist">UserPage</a></li>
+				               {{/if}}
+				               <li><a href="/www/main/page">Snakegame</a></li>
+				           	</ul>
+				           	<div align="right" style="margin-top:20px;">Hi,{{$session_name}} (
+				           		<font style="color:#A9A9A9; ">
+								{{if ($session_level)==0}}
+								    最高權限
+								{{elseif ($session_level)==3}}
+									管理者
+								{{elseif ($session_level)==5}}
+									一般使用者
+								{{elseif ($session_level)==9}}
+									停權中
+								{{/if}}
+								</font>
+				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
+				       	</div><!-- /.navbar-collapse -->
+					</div>
+				   	<!-- /.container-fluid -->
+				</nav>
+				<!--分頁處理Start-->
+				<ul class="pagination">
+					{{if ($page==1)}}
+						{{$prePage=1}}
+					{{else}}
+						{{$prePage=$page-1}}
+					{{/if}}
+					{{if ($page==$pagecnt)}}
+						{{$nextPage=$pagecnt}}
+					{{else}}
+						{{$nextPage=$page+1}}
+					{{/if}}
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					{{for $idx=1 to $pagecnt}}
+					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+					{{/for}}
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+				</ul>
+				<!--分頁處理End-->
+				<table class="table table-striped">
+					<tr>
+						<th nowrap>UserID</th>
+						<th nowrap>UserName</th>
+						<th nowrap>UserEmail</th>
+						<th nowrap>UserLevel</th>
+						{{if $session_level==0}}
+						<th nowrap>UserStatus</th>
+						{{/if}}
+						<th nowrap></th>
+					</tr>
+					{{foreach from=$userlist item=item}}
+					<tr>
+						<td align="left" nowrap>
+							{{$item.user_id}}
+						</td>
+						<td align="left" nowrap>
+							{{$item.user_name}}
+						</td>
+						<td align="left" nowrap>
+							{{$item.user_email}}
+						</td>
+						<td align="left" nowrap>
+							{{if ($item.user_level)==0}}
+							    最高權限
+							{{elseif ($item.user_level)==3}}
+								管理者
+							{{elseif ($item.user_level)==5}}
+								一般使用者
+							{{elseif ($item.user_level)==9}}
+								停權中
+							{{/if}}
+						<td align="left" nowrap>
+							{{if ($item.user_level)>0 && $session_level==0}}
+								{{if ($item.user_level!=9)}}
+								啟用中<a href="#" title="停用" onclick="disable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-close"></span></a>
+								{{/if}}
+
+								{{if ($item.user_level==9)}}
+								停用中<a href="#" title="啟用" onclick="enable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-check"></span></a>
+								{{/if}}
+							{{/if}}
+						</td>
+						{{if $session_level==0}}
+						<td align="left" nowrap>
+							{{if ($item.user_level)>0}}
+							<a href="#" title="管理" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_id}}','{{$item.user_name}}','{{$item.user_level}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+							{{/if}}
+						</td>
+						{{/if}}
+					</tr>
+					{{/foreach}}
+				</table>
+				<!--分頁處理Start-->
+				<ul class="pagination">
+					{{if ($page==1)}}
+						{{$prePage=1}}
+					{{else}}
+						{{$prePage=$page-1}}
+					{{/if}}
+					{{if ($page==$pagecnt)}}
+						{{$nextPage=$pagecnt}}
+					{{else}}
+						{{$nextPage=$page+1}}
+					{{/if}}
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					{{for $idx=1 to $pagecnt}}
+					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+					{{/for}}
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+				</ul>
+				<!--分頁處理End-->
+			</div>
+		</form>
+	</body>
+</html>
+
