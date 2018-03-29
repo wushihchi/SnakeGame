@@ -15,7 +15,7 @@ class Angeldb_User_Model extends MyDBModel
     );
 
     public function userListMsg() {
-    	$sql = "SELECT *  FROM `User` WHERE `user_level` != 9 ORDER BY `user_name` ASC";
+    	$sql = "SELECT * FROM `User` WHERE `user_level` != 9 ORDER BY `user_name` ASC";
     	return $this->select_all($sql); 
     }
 }

@@ -21,7 +21,6 @@ class Msg_List_Ctl extends Controller
 
             $iPageCnt = ceil($iMsgCnt/$iPageSize);
 
-            //$iLimit1 = $iPageSize*$iPage;
             $iLimit2 = $iPageSize*($iPage-1);
             
             $aMsgList = $oMsgModel->find(array('pmsg_id' => 0), array(
@@ -31,8 +30,7 @@ class Msg_List_Ctl extends Controller
             ));
 
             $aReplyMsgList = $oMsgModel->replyMsg();
-
-            //return json_encode($aMsgList);
+            
             $aMsgUser = $oMsgModel->find_col('user_id',array(),array('field' => 'user_id'));
             $aUserNameList = $oUserModel->find_pair(
                 'user_id',
@@ -49,17 +47,14 @@ class Msg_List_Ctl extends Controller
 
             //第三個參數,放user_id或是receiver結果都一樣,就先不管了
             $aReceiver = $oMsgModel->find_col('receiver',array(),array('field' => 'user_id'));
-            //return $aReceiver;
+            
             $aReceiverNameList = $oUserModel->find_pair(
                 'user_id',
                 'user_name',
                 array('user_id'=>$aReceiver),
                 array()
             );
-            //return json_encode($aReceiverNameList);
-            echo '<pre>';
-            print_r($aMsgList);
-            //exit;
+
             foreach ($aMsgList as $iKey => $aValue) {
 
                 $sPrivate = "";
@@ -93,9 +88,11 @@ class Msg_List_Ctl extends Controller
                     $aMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
                     $aMsgList[$iKey]['allow_reply'] = true;
                 }
-                //$aMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aMsgList[$iKey]['receiver']];
+
                 if($aMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
                     $aMsgList[$iKey]['className'] = 'box box-blue';
+                }elseif($aMsgList[$iKey]['user_id'] == '23'){
+                    $aMsgList[$iKey]['className'] = 'box box-yellow';
                 }else{
                     $aMsgList[$iKey]['className'] = 'box box-gray';
                 }
@@ -127,36 +124,28 @@ class Msg_List_Ctl extends Controller
                         $aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
                     }
 
-                    // if($aReceiverNameList[$aReplyMsgList[$iKey]['receiver']] != ''){
-                    //     $aReplyMsgList[$iKey]['receiver_nm'] = " to ".$aReceiverNameList[$aReplyMsgList[$iKey]['receiver']];
-                    // }
-                    
                     $aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']).'  '.$sPrivate;
                 }
 
-                //$aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
-                
-                //$aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']);
-                //$aReplyMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aReplyMsgList[$iKey]['receiver']];
                 if($aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
                     $aReplyMsgList[$iKey]['className'] = 'box box-blue';
+                }elseif($aReplyMsgList[$iKey]['user_id'] == '23'){
+                    $aReplyMsgList[$iKey]['className'] = 'box box-yellow';
                 }else{
                     $aReplyMsgList[$iKey]['className'] = 'box box-gray';
                 }
             }
             
 
-
             $aUserSelectList = $oUserModel->userListMsg();
             $sUserSelectListStr = "";
             foreach ($aUserSelectList as $iKey => $aValue) {
-                $sUserSelectListStr = $sUserSelectListStr."<option value='".$aUserSelectList[$iKey]['user_id']."'>".$aUserSelectList[$iKey]['user_name'].'</option>';
+                if($aUserSelectList[$iKey]['user_level'] != '2'){
+                    $sUserSelectListStr = $sUserSelectListStr."<option value='".$aUserSelectList[$iKey]['user_id']."'>".$aUserSelectList[$iKey]['user_name'].'</option>';
+                }
+                
             }
 
-            // echo '<pre>';
-            // print_r($sUserSelectListStr);
-            // exit;
-            //return json_encode($aMsgList);
             unset($oMsgModel);
             unset($oUserModel);
 
@@ -312,6 +301,9 @@ class Msg_List_Ctl extends Controller
         {
             case 0:
                 return '最高權限';
+                break;    
+            case 2:
+                return '系統';
                 break;  
             case 3:
                 return '管理者';

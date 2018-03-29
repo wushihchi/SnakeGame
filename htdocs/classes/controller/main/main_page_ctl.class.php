@@ -127,6 +127,21 @@ class Main_Page_Ctl extends Controller
             'play_dtm'  => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
         ));
 
+        $oUserModel = new Angeldb_User_Model;
+        $sUserName = $oUserModel->find(array('user_id' => $sPlayerId), array(
+            'field' => 'user_id, user_name'
+        ));
+
+        $oMsgModel = new Angeldb_MsgBoard_Model;
+        $sMsgContent = "玩家 <font style=''color:blue;''>".$sUserName[0]['user_name']."</font> 剛剛在貪食蛇遊戲中，創下了 <font style=''color:red;''>".$iScore."</font> 的驚人紀錄!!";
+        $primary_key = $oMsgModel->insert(array(
+            'user_id'     => '23',
+            'msg_content' => $sMsgContent,
+            'private_fg'  => false,
+            'receiver'    => 0,
+            'msg_dtm'     => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
+        ));
+
         unset($oModel);
         if ($primary_key) {
             return true;
@@ -186,6 +201,9 @@ class Main_Page_Ctl extends Controller
         {
             case 0:
                 return '最高權限';
+                break;  
+            case 2:
+                return '系統';
                 break;  
             case 3:
                 return '管理者';

@@ -195,6 +195,9 @@ class User_List_Ctl extends Controller
         {
             case 0:
                 return '最高權限';
+                break;    
+            case 2:
+                return '系統';
                 break;  
             case 3:
                 return '管理者';

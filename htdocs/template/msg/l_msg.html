@@ -33,6 +33,12 @@
 				color: #4D4D4D;
 				font-family: '微軟正黑體';
 			}
+			.box-yellow{
+				border: #CCCCCC 1px solid;
+				background-color: #FFFFE2;
+				color: #4D4D4D;
+				font-family: '微軟正黑體';
+			}
 
 			.ui-icon { 
 			    zoom: 125%; 
@@ -188,19 +194,21 @@
 				<!--分頁處理End-->
 				<table class="table img-rounded">
 					{{foreach from=$msglist item=item}}
-					<tr >
+					<tr>
 						<td align="left" {{$bgColor}} class="{{$item.className}}" style="border: 0px;">
 							<font style="font-size:20px;font-weight:bold;">{{$item.user_name}} {{$item.receiver_nm}}</font>
-							{{if ($session_id==$item.user_id)}}
-							<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','{{$item.msg_content}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+							{{if $item.user_level!=2}}
+								{{if ($session_id==$item.user_id)}}
+								<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','{{$item.msg_content}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+								{{/if}}
+								{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
+								<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+								{{/if}}
+								{{if $item.allow_reply==true}}
+								<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
+								{{/if}}
 							{{/if}}
-							{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
-							<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
-							{{/if}}
-							{{if $item.allow_reply==true}}
-							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
 							<br>
-							{{/if}}
 							<font style="font-size:10px;color:#A9A9A9;">{{$item.user_level_nm}}</font>
 							<br>
 							<font style="font-size:16px;">{{$item.msg_content}}</font>
@@ -212,13 +220,15 @@
 								<br>
 								<div class="{{$replyitem.className}}" style="margin-left:50px;">
 								    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
-								    {{if ($session_id==$replyitem.user_id)}}
-								    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
-								    {{/if}}
-								    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
-								    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
-								    {{/if}}
-								    <br>
+								    {{if $replyitem.user_level!=2}}
+									    {{if ($session_id==$replyitem.user_id)}}
+									    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+									    {{/if}}
+									    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
+									    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+									    {{/if}}
+									{{/if}}
+									<br>
 								    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">{{$replyitem.user_level_nm}}</font>
 									<br>
 								    <font class="reply" style="font-size:14px;">{{$replyitem.msg_content}}</font><br><br>
@@ -247,6 +257,14 @@
 	</body>
 </html>
 <script type="text/javascript">
+window.onload = function()
+{
+    //window.setInterval("reload();", 3000);
+}
+
+function reload() {
+ 	location.reload();
+}
 function submintClick()
 {
 	var UserId = $('#UserId').val().trim();
