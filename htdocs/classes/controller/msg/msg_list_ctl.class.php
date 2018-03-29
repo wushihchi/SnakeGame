@@ -68,15 +68,16 @@ class Msg_List_Ctl extends Controller
                 }
 
                 if($aMsgList[$iKey]['private_fg'] == true &&
-                    !(
-                    $aMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
-                    $aMsgList[$iKey]['user_id'] == $_SESSION['user_id']
-                    )
+                    !($aMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
+                    $aMsgList[$iKey]['user_id'] == $_SESSION['user_id']) &&
+                    $_SESSION['user_level'] != 3 &&
+                    $_SESSION['user_level'] != 0
                 ){
                     $aMsgList[$iKey]['user_name'] = "悄悄話";
                     $aMsgList[$iKey]['msg_content'] = "悄悄話";
                     $aMsgList[$iKey]['receiver_nm'] = "";
                     $aMsgList[$iKey]['user_level_nm'] = "";
+                    $aMsgList[$iKey]['allow_reply'] = false;
                 }else{
                     if($aMsgList[$iKey]['user_id'] == 0){
                         $aMsgList[$iKey]['user_name'] = "使用者已刪除";
@@ -89,6 +90,7 @@ class Msg_List_Ctl extends Controller
                     }
                     
                     $aMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
+                    $aMsgList[$iKey]['allow_reply'] = true;
                 }
 
                 $aMsgList[$iKey]['user_level'] = $aUserLevelList[$aMsgList[$iKey]['user_id']];
@@ -110,8 +112,8 @@ class Msg_List_Ctl extends Controller
                 if($aReplyMsgList[$iKey]['private_fg'] == true &&
                     !($aReplyMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
                     $aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']) &&
-                    $_SESSION['user_id'] != 3 &&
-                    $_SESSION['user_id'] != 0
+                    $_SESSION['user_level'] != 3 &&
+                    $_SESSION['user_level'] != 0
                 ){
                     $aReplyMsgList[$iKey]['user_name'] = "悄悄話";
                     $aReplyMsgList[$iKey]['msg_content'] = "悄悄話";

@@ -197,8 +197,10 @@
 							{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
 							<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
 							{{/if}}
+							{{if $item.allow_reply==true}}
 							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
 							<br>
+							{{/if}}
 							<font style="font-size:10px;color:#A9A9A9;">{{$item.user_level_nm}}</font>
 							<br>
 							<font style="font-size:16px;">{{$item.msg_content}}</font>
