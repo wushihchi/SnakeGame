@@ -67,404 +67,7 @@
 		    	text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
 		    }
 		</style>
-
-		<script type="text/javascript">
-		    //code by CNwander.
-		    //website at http://www.webjx.com/javascript/jsajax-16454.html
-		    //common
-		    function $id(str)
-		    {
-		        return document.getElementById(str);
-		    }
-		    function $tag(str, target)
-		    {
-		        target = target || document;
-		        return target.getElementsByTagName(str);
-		    }
-		    //創建二維陣列
-		    function multiArray(m, n)
-		    {
-		        var arr = new Array(n); //創建Array物件構造器, n=陣列最大下標長度
-		        for(var i = 0; i < m; i++) {
-		            arr[i] = new Array(m); //二維
-		        }
-		        return arr;
-		    }
-		    //global
-		    //const
-		    var WIDTH = 20, //網格寬度
-		        HEIGHT = 20, //網格高度
-		        SAY = ["肚子好餓呀~~", "我不挑食~甚麼都吃~~~", "慢慢吃慢慢長大~~~", "源源不絕的食物真好!!"]; //對話
-		    var len, //蛇的長度
-		        speed, //爬行速度
-		        gridElems = multiArray(WIDTH, HEIGHT), //儲存格對象,UI元件指標陣列
-		        carrier = multiArray(WIDTH, HEIGHT), //承載對象(遮蓋cover、食物food、障礙block、滑板skate、刹車brake),紀錄陣列值得2D陣列
-		        snake, //蛇每節的座標點
-		        info, //交互對話
-		        topScore, //最高分
-		        btnStart, //開始按鈕
-		        snakeTimer, //蛇行走計時器
-		        brakeTimers = [], //隨機刹車
-		        skateTimers = [], //隨機滑板
-		        overMsg, //Gameover訊息
-		        chkDirect = true, //Gameover訊息
-		        directkey; //方向鍵值 37-40(左、上、右、下)
-
-		    function initGrid(iDiv)
-		    {
-		        //var body = $tag("body")[0];
-		        var table = document.createElement("table");//建立HTML的table元件放在記憶體中，當時體化後會受到CSS影響
-		        var tbody = document.createElement("tbody"); //tbody為HTML檔的表格元素(element)，用於設置表格內容
-		        
-		        for(var j = 0; j < HEIGHT; j++) {
-		            var col = document.createElement("tr");//建立列元素
-		            for(var i = 0; i < WIDTH; i++) {
-		                var row = document.createElement("td");//建立一列有幾個元素
-		                gridElems[i][j] = col.appendChild(row);//把每一個HTML的最小單元存放在記憶體中->當指標用
-		            }
-		            tbody.appendChild(col);//把每一列依序放到表格身體中的記憶體中
-		        }
-		        table.appendChild(tbody);//把建立好的表格身體放到表格的記憶體中
-		        $id(iDiv).appendChild(table); //div 利用function $id(str)函數把記憶體內的表格實現出來(不是用jquery的選擇器)
-		    }
-		    //元件文字輸出資訊(使用Javascript)
-		    function trace(sth, who)
-		    {
-		        who = who || info;
-		        if(document.all) { //相容判斷是否是IE流覽器
-		            who.innerText = sth; //Internet Explorer
-		        } else {
-		            who.textContent = sth; //Firefox 
-		        }
-		    }
-		    //產生指定範圍隨機點
-		    function randomPointer(startX, startY, endX, endY)
-		    {
-		        startX = startX || 0;
-		        startY = startY || 0;
-		        endX = endX || WIDTH;
-		        endY = endY || HEIGHT;
-		        var p = [],
-		            x = Math.floor(Math.random() * (endX - startX)) + startX, //Math.floor=返回小於等於x的最大整數
-		            y = Math.floor(Math.random() * (endY - startY)) + startY;
-		        if(carrier[x][y]) { //查證承載物件是否已有物品
-		            return randomPointer(startX, startY, endX, endY);//如果已放物品就利用遞迴重新計算
-		        }
-		        p[0] = x;
-		        p[1] = y;
-		        return p;
-		    }    
-		    
-		    //清除畫面
-		    function clear()
-		    {
-		        for(var y = 0; y < gridElems.length; y++) {
-		            for(var x = 0; x < gridElems[y].length; x++) {
-		                gridElems[x][y].className = ""; //儲存格對象=移除CSS的className[使用在建立表格實體時的指標來時做物件存取]
-		            }
-		        }
-		    }
-		    //創建蛇
-		    function initSnake()
-		    {
-		    	//len = 3;
-		        var len1 = len - 1;
-		        var pointer = randomPointer(len1, len1, WIDTH / 2, HEIGHT / 2);
-		        //console.log('pointer=['+pointer+']');
-		        for(var i = 0; i < len; i++) {
-
-		            var x = pointer[0] - i,
-		                y = pointer[1];
-		            snake.push([x, y]); //向陣列末尾添加一個或多個元素，並返回陣列的長度
-		            //console.log('x=['+x+']y=['+y+']');
-		            carrier[x][y] = "cover";
-		            
-		        }
-		    }
-		    //添加物品
-		    function addObject(name)
-		    {
-		        /*
-		        "block"-添加障礙物
-		        "food"-添加食物
-		        "brake"-添加煞車
-		        "skate"-添加加速        
-		        */
-		        var p = randomPointer();
-		        carrier[p[0]][p[1]] = name;
-		        gridElems[p[0]][p[1]].className = name;//利用指標新增元件的CSS的class
-		    }
-		    
-		    //獲取資訊-抓取目前的提示在UI上的文字
-		    function getText(target)
-		    {
-		        if(document.all) {
-		            return target.innerText;
-		        } else {
-		            return target.textContent;
-		        }
-		    }
-		    
-		    //最高分累加顯示
-		    function dispscore(addscore)
-		    {
-		        topScore += addscore;
-		        trace(topScore, $id("score")); //最高分，先透過function $id(str)取得元件,之後再用trace函數設定顯示文字
-		    }
-		    
-		    //蛇行走目標點
-		    function step()
-		    {//實體動作函數
-		        var speedup = false;
-		        //獲取目標點
-		        //蛇頭位置
-		        var headX = parseInt(snake[0][0]),
-		            headY = parseInt(snake[0][1]);
-		        //方向鍵
-		        switch(directkey) {//按照鍵盤輸入,改變蛇頭位置
-		            case 37: //左
-		                headX -= 1;
-		                break;
-		            case 38: //上
-		                headY -= 1;
-		                break;
-		            case 39: //右
-		                headX += 1;
-		                break;
-		            case 40: //下
-		                headY += 1;
-		                break;
-		        }
-		        chkDirect = true;
-		        //碰到邊界WIDTH or HEIGHT、障礙物block，則結束遊戲
-		        if(headX >= WIDTH || headX < 0 || headY >= HEIGHT || headY < 0){
-		        	overMsg = "跑太遠了ლ(ﾟдﾟლ)";
-		        	trace(overMsg);
-		        	gameOver();
-		        	return false;
-		        }else{
-		        	var carrierXY = carrier[headX][headY];
-			        if(carrierXY == "block" || carrierXY == "cover" ) {
-			        	if(carrierXY == "block"){
-			        		overMsg = "頭好暈阿@~@";
-			        		trace(overMsg);
-			        	}else{
-			        		overMsg = "打結了ヽ(o’Д`o)ノ";
-			        		trace(overMsg);
-			        	}
-			            gameOver();
-			            return false;
-			        }
-		        }
-		        
-		         //加速
-		        if(len % 4 == 0 && speed < 60 && carrierXY == "food") {
-		            speed += 5;
-		            walk();
-		            speedup = true;
-		            trace("加速 (ˊ● ω ●ˋ)！");
-		            topScore += 100;
-		        }
-			    //撿到刹車
-			    if(carrierXY == "brake") {
-			        speed = 5;
-		            walk();
-		            trace("恭喜！撿到刹車一個(๑˘ ₃˘๑)");
-		            topScore += 10;
-		        }                
-		    	//遭遇滑板
-		        if(carrierXY == "skate") {
-		            speed += 20;
-		            walk();
-		            trace("遭遇滑板இдஇ");
-		            topScore += 100;
-		        }
-		         //添加障礙物
-		        if(len % 6 == 0 && len < 60 && carrierXY == "food") {
-		            addObject("block");
-		        }
-
-		        //對話: 鼓勵
-		        if(len <= 40 && len % 10 == 0) {
-		            var cheer = SAY[len / 10 - 1];
-		            trace(cheer);
-		        }
-		        //吃東西
-		        //吃-只加頭-移動和增長效果
-		        //動-刪尾&加頭-移動效果
-		        //console.log('carrierXY=['+carrierXY+']');
-		        if(carrierXY != "food") {
-		            //單純移動
-		            var snake1 = snake.length - 1;
-		            var lastX = snake[snake1][0],
-		                lastY = snake[snake1][1];//取出蛇尾
-		            carrier[lastX][lastY] = false;//刪除蛇尾在2D資料內的紀錄
-		            gridElems[lastX][lastY].className = "";//刪除蛇尾在UI上
-		            snake.pop(); //刪除陣列最後一個元素,並將該元素作為返回值返回。如果陣列的長度為0，則返回undefined
-		        } else {
-		            //吃到東西
-		            carrier[headX][headY] = false;//刪除蛇尾在2D資料內的紀錄
-		            addObject("food"); //添加食物
-		            topScore += 10;
-		            (speedup) ? trace("加速இдஇ") : trace("好吃好吃（▼皿▼＃");
-		        }
-		        snake.unshift([headX, headY]); //向陣列開頭添加一個元素，並返回新的陣列長度
-		        for(var idx=0;idx<len;idx++){
-
-		        }
-		        carrier[headX][headY] = "cover";//在2D資料內的紀錄蛇身
-		        //carrier[headX][headY] = "snakehead";//在2D資料內的紀錄蛇身
-		        //gridElems[headX][headY].className = "cover";//蛇身在UI上
-		        gridElems[headX][headY].className = "snakehead";//蛇身在UI上
-		        for(var y = 0; y < gridElems.length; y++) {
-		            for(var x = 0; x < gridElems[y].length; x++) {
-		            	if(carrier[x][y]=="cover"){
-		            		gridElems[x][y].className = "cover"; //儲存格對象=移除CSS的className[使用在建立表格實體時的指標來時做物件存取]
-		            	}
-		                
-		            }
-		        }
-
-		        gridElems[headX][headY].className = "snakehead";//蛇身在UI上
-		        len = snake.length; //返回一個陣列的長度
-		        trace(topScore, $id("score")); //最高分
-		    }
-
-		    function gameOver()
-		    {
-		    	if(getText($id("score")) * 1 < len) {
-	                trace(len, $id("score"));
-	            }
-	            btnStart.removeAttribute("disabled"); //按鈕致能
-	            btnStart.style.color = "#000"; //按鈕字體顏色復原
-	            window.clearInterval(snakeTimer); //取消由setInterval()方法設置的計時器
-	            for(var i = 0; i < brakeTimers.length; i++) {
-	                window.clearTimeout(brakeTimers[i]); //刹車, 取消由setTimeout()方法設置的timeout及其帶來的行為
-	            }
-	            for(var i = 0; i < skateTimers.length; i++) {
-	                window.clearTimeout(skateTimers[i]); //滑板, 取消由setTimeout()方法設置的timeout及其帶來的行為
-	            }
-	            //trace("GAME OVER");
-	            //分數存檔
-	            alert(overMsg);
-	            saveScore(topScore);
-	            //document.frames('scoreiframe').location.reload();
-	            
-	            return false; //停止Javascript的處理程式
-		    }
-
-		    function saveScore(iScore)
-		    {
-		    	var Player = document.getElementById('player_id').value;
-		    	$.ajax({
-				    url: "/www/main/page/save",
-				    method:"post",
-				    data: {score:iScore,player_id:Player}
-				}).done(function(result) {
-					if(result){
-						window.frames['scoreiframe'].location.reload();
-						window.frames['rankiframe'].location.reload();
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-		    }
-
-		    //蛇行走控制
-		    //建立TIMER,step實體動作函數
-		    function walk()
-		    {
-		        if(snakeTimer) {
-		            window.clearInterval(snakeTimer); //取消由setInterval()方法設置的計時器
-		        }
-		        snakeTimer = window.setInterval(step, Math.floor(3000 / speed)); //按照指定的週期(以毫秒計)來調用函數或計算運算式, 參數1(step函數): 為重複動作的程式碼，參數2: 則是延遲時間
-		    }
-		    //產生隨機整數
-		    function randowNum(start, end)
-		    {
-		        return Math.floor(Math.random() * (end - start)) + start;
-		    }
-
-		    //產生0~3的變數
-		    function randNum()
-		    {
-		        //Math.random()->0~1
-		        //(Math.random() * 10)->0~9
-		        //(Math.random() * 10) % 4->0~3
-		        //Math.floor()->取整數
-		        return Math.floor((Math.random() * 10) % 4);
-		    }
-		    //添加亂數量刹車和滑板
-		    function addRandomBrake()
-		    {
-		        var num = randowNum(1, 5);
-		        for(var i = 0; i < num; i++) {
-		            brakeTimers.push(window.setTimeout(function(){ addObject("brake") }, randowNum(10000, 100000))); //刹車, 按照一定週期調用計時函數
-		            skateTimers.push(window.setTimeout(function(){ addObject("skate") }, randowNum(5000, 100000))); //滑板, 按照一定週期調用計時函數
-		        }
-		    }
-		    //遊戲開始
-		    function start()
-		    {//遊戲的開始
-		        //len = randNum() + 1; //蛇的隨機長度[1~4]
-		        len = 3;
-		        if(len==0){
-		        	len = 1;
-		        }
-		        speed = 10; //蛇的爬行速度 = 10 (1000 ms = 1 second)
-		        directkey = 36 + len; //隨機決定方向[37~40]
-		        topScore = len; //分數
-		        carrier = multiArray(WIDTH, HEIGHT); //承載物件 = 二維陣列(WIDTH, HEIGHT)
-		        snake = new Array(); //宣告一個新的陣列
-		        clear(); //清除畫布
-		        initSnake(); //蛇初始化
-		        addObject("food"); //添加食物
-		        walk(); //蛇行走[啟動TIMER]
-		        addRandomBrake(); //添加刹車和滑板
-		        trace("出發ヽ（・∀・）ノ"); //顯示文字
-		        trace(topScore, $id("score")); //最高分
-		    }
-
-		    //添加鍵盤事件
-		    //只把按鍵值記錄到變數，並回傳FALSE達到讓網頁不處理該按鍵事件(事件屏蔽)
-		    function attachEvents(e)
-		    {
-		        e = e || event;
-
-		        //非方向鍵、反向無效
-		        if(chkDirect){
-		        	directkey = Math.abs(e.keyCode - directkey) != 2 && e.keyCode > 36 && e.keyCode < 41 ? e.keyCode : directkey; 
-		        	chkDirect = false;
-		        }
-		        
-
-		        return false; //停止Javascript的處理程式
-		    }
-
-		    //程式的進入點
-		    window.onload = function()
-		    {
-		        info = $id("say");
-		        initGrid("snakeWrap"); //網格初始化
-		        document.onkeydown = attachEvents; //綁定方向事件
-		        btnStart = $id("btnStart");
-		        btnStart.onclick = function (e) {
-		            btnStart.blur(); //firefox中必須釋放焦點
-		            btnStart.setAttribute("disabled", true);
-		            btnStart.style.color = "#696969"; //中等亮度的灰色陰影
-		            start(); //遊戲開始
-		        }
-		        window.setInterval("reloadIFrame();", 30000);
-		    }
-
-		    function reloadIFrame() {
-			 	window.frames['rankiframe'].location.reload();
-			}
-		</script>
 	</head>
-
 	<body onSelectStart="return false"><!--防止滑鼠拖拉-->
 		<div class="container">
 			<div class="row">
@@ -490,5 +93,399 @@
 			</div>
 		</div>
 	</body>
-
 </html>
+<script type="text/javascript">
+//code by CNwander.
+//website at http://www.webjx.com/javascript/jsajax-16454.html
+//common
+function $id(str)
+{
+    return document.getElementById(str);
+}
+function $tag(str, target)
+{
+    target = target || document;
+    return target.getElementsByTagName(str);
+}
+//創建二維陣列
+function multiArray(m, n)
+{
+    var arr = new Array(n); //創建Array物件構造器, n=陣列最大下標長度
+    for(var i = 0; i < m; i++) {
+        arr[i] = new Array(m); //二維
+    }
+    return arr;
+}
+//global
+//const
+var WIDTH = 20, //網格寬度
+    HEIGHT = 20, //網格高度
+    SAY = ["肚子好餓呀~~", "我不挑食~甚麼都吃~~~", "慢慢吃慢慢長大~~~", "源源不絕的食物真好!!"]; //對話
+var len, //蛇的長度
+    speed, //爬行速度
+    gridElems = multiArray(WIDTH, HEIGHT), //儲存格對象,UI元件指標陣列
+    carrier = multiArray(WIDTH, HEIGHT), //承載對象(遮蓋cover、食物food、障礙block、滑板skate、刹車brake),紀錄陣列值得2D陣列
+    snake, //蛇每節的座標點
+    info, //交互對話
+    topScore, //最高分
+    btnStart, //開始按鈕
+    snakeTimer, //蛇行走計時器
+    brakeTimers = [], //隨機刹車
+    skateTimers = [], //隨機滑板
+    overMsg, //Gameover訊息
+    chkDirect = true, //Gameover訊息
+    directkey; //方向鍵值 37-40(左、上、右、下)
+
+function initGrid(iDiv)
+{
+    //var body = $tag("body")[0];
+    var table = document.createElement("table");//建立HTML的table元件放在記憶體中，當時體化後會受到CSS影響
+    var tbody = document.createElement("tbody"); //tbody為HTML檔的表格元素(element)，用於設置表格內容
+    
+    for(var j = 0; j < HEIGHT; j++) {
+        var col = document.createElement("tr");//建立列元素
+        for(var i = 0; i < WIDTH; i++) {
+            var row = document.createElement("td");//建立一列有幾個元素
+            gridElems[i][j] = col.appendChild(row);//把每一個HTML的最小單元存放在記憶體中->當指標用
+        }
+        tbody.appendChild(col);//把每一列依序放到表格身體中的記憶體中
+    }
+    table.appendChild(tbody);//把建立好的表格身體放到表格的記憶體中
+    $id(iDiv).appendChild(table); //div 利用function $id(str)函數把記憶體內的表格實現出來(不是用jquery的選擇器)
+}
+//元件文字輸出資訊(使用Javascript)
+function trace(sth, who)
+{
+    who = who || info;
+    if(document.all) { //相容判斷是否是IE流覽器
+        who.innerText = sth; //Internet Explorer
+    } else {
+        who.textContent = sth; //Firefox 
+    }
+}
+//產生指定範圍隨機點
+function randomPointer(startX, startY, endX, endY)
+{
+    startX = startX || 0;
+    startY = startY || 0;
+    endX = endX || WIDTH;
+    endY = endY || HEIGHT;
+    var p = [],
+        x = Math.floor(Math.random() * (endX - startX)) + startX, //Math.floor=返回小於等於x的最大整數
+        y = Math.floor(Math.random() * (endY - startY)) + startY;
+    if(carrier[x][y]) { //查證承載物件是否已有物品
+        return randomPointer(startX, startY, endX, endY);//如果已放物品就利用遞迴重新計算
+    }
+    p[0] = x;
+    p[1] = y;
+    return p;
+}    
+
+//清除畫面
+function clear()
+{
+    for(var y = 0; y < gridElems.length; y++) {
+        for(var x = 0; x < gridElems[y].length; x++) {
+            gridElems[x][y].className = ""; //儲存格對象=移除CSS的className[使用在建立表格實體時的指標來時做物件存取]
+        }
+    }
+}
+//創建蛇
+function initSnake()
+{
+	//len = 3;
+    var len1 = len - 1;
+    var pointer = randomPointer(len1, len1, WIDTH / 2, HEIGHT / 2);
+    //console.log('pointer=['+pointer+']');
+    for(var i = 0; i < len; i++) {
+
+        var x = pointer[0] - i,
+            y = pointer[1];
+        snake.push([x, y]); //向陣列末尾添加一個或多個元素，並返回陣列的長度
+        //console.log('x=['+x+']y=['+y+']');
+        carrier[x][y] = "cover";
+        
+    }
+}
+//添加物品
+function addObject(name)
+{
+    /*
+    "block"-添加障礙物
+    "food"-添加食物
+    "brake"-添加煞車
+    "skate"-添加加速        
+    */
+    var p = randomPointer();
+    carrier[p[0]][p[1]] = name;
+    gridElems[p[0]][p[1]].className = name;//利用指標新增元件的CSS的class
+}
+
+//獲取資訊-抓取目前的提示在UI上的文字
+function getText(target)
+{
+    if(document.all) {
+        return target.innerText;
+    } else {
+        return target.textContent;
+    }
+}
+
+//最高分累加顯示
+function dispscore(addscore)
+{
+    topScore += addscore;
+    trace(topScore, $id("score")); //最高分，先透過function $id(str)取得元件,之後再用trace函數設定顯示文字
+}
+
+//蛇行走目標點
+function step()
+{//實體動作函數
+    var speedup = false;
+    //獲取目標點
+    //蛇頭位置
+    var headX = parseInt(snake[0][0]),
+        headY = parseInt(snake[0][1]);
+    //方向鍵
+    switch(directkey) {//按照鍵盤輸入,改變蛇頭位置
+        case 37: //左
+            headX -= 1;
+            break;
+        case 38: //上
+            headY -= 1;
+            break;
+        case 39: //右
+            headX += 1;
+            break;
+        case 40: //下
+            headY += 1;
+            break;
+    }
+    chkDirect = true;
+    //碰到邊界WIDTH or HEIGHT、障礙物block，則結束遊戲
+    if(headX >= WIDTH || headX < 0 || headY >= HEIGHT || headY < 0){
+    	overMsg = "跑太遠了ლ(ﾟдﾟლ)";
+    	trace(overMsg);
+    	gameOver();
+    	return false;
+    }else{
+    	var carrierXY = carrier[headX][headY];
+        if(carrierXY == "block" || carrierXY == "cover" ) {
+        	if(carrierXY == "block"){
+        		overMsg = "頭好暈阿@~@";
+        		trace(overMsg);
+        	}else{
+        		overMsg = "打結了ヽ(o’Д`o)ノ";
+        		trace(overMsg);
+        	}
+            gameOver();
+            return false;
+        }
+    }
+    
+     //加速
+    if(len % 4 == 0 && speed < 60 && carrierXY == "food") {
+        speed += 5;
+        walk();
+        speedup = true;
+        trace("加速 (ˊ● ω ●ˋ)！");
+        topScore += 100;
+    }
+    //撿到刹車
+    if(carrierXY == "brake") {
+        speed = 5;
+        walk();
+        trace("恭喜！撿到刹車一個(๑˘ ₃˘๑)");
+        topScore += 10;
+    }                
+	//遭遇滑板
+    if(carrierXY == "skate") {
+        speed += 20;
+        walk();
+        trace("遭遇滑板இдஇ");
+        topScore += 100;
+    }
+     //添加障礙物
+    if(len % 6 == 0 && len < 60 && carrierXY == "food") {
+        addObject("block");
+    }
+
+    //對話: 鼓勵
+    if(len <= 40 && len % 10 == 0) {
+        var cheer = SAY[len / 10 - 1];
+        trace(cheer);
+    }
+    //吃東西
+    //吃-只加頭-移動和增長效果
+    //動-刪尾&加頭-移動效果
+    //console.log('carrierXY=['+carrierXY+']');
+    if(carrierXY != "food") {
+        //單純移動
+        var snake1 = snake.length - 1;
+        var lastX = snake[snake1][0],
+            lastY = snake[snake1][1];//取出蛇尾
+        carrier[lastX][lastY] = false;//刪除蛇尾在2D資料內的紀錄
+        gridElems[lastX][lastY].className = "";//刪除蛇尾在UI上
+        snake.pop(); //刪除陣列最後一個元素,並將該元素作為返回值返回。如果陣列的長度為0，則返回undefined
+    } else {
+        //吃到東西
+        carrier[headX][headY] = false;//刪除蛇尾在2D資料內的紀錄
+        addObject("food"); //添加食物
+        topScore += 10;
+        (speedup) ? trace("加速இдஇ") : trace("好吃好吃（▼皿▼＃");
+    }
+    snake.unshift([headX, headY]); //向陣列開頭添加一個元素，並返回新的陣列長度
+    for(var idx=0;idx<len;idx++){
+
+    }
+    carrier[headX][headY] = "cover";//在2D資料內的紀錄蛇身
+    //carrier[headX][headY] = "snakehead";//在2D資料內的紀錄蛇身
+    //gridElems[headX][headY].className = "cover";//蛇身在UI上
+    gridElems[headX][headY].className = "snakehead";//蛇身在UI上
+    for(var y = 0; y < gridElems.length; y++) {
+        for(var x = 0; x < gridElems[y].length; x++) {
+        	if(carrier[x][y]=="cover"){
+        		gridElems[x][y].className = "cover"; //儲存格對象=移除CSS的className[使用在建立表格實體時的指標來時做物件存取]
+        	}
+            
+        }
+    }
+
+    gridElems[headX][headY].className = "snakehead";//蛇身在UI上
+    len = snake.length; //返回一個陣列的長度
+    trace(topScore, $id("score")); //最高分
+}
+
+function gameOver()
+{
+	if(getText($id("score")) * 1 < len) {
+        trace(len, $id("score"));
+    }
+    btnStart.removeAttribute("disabled"); //按鈕致能
+    btnStart.style.color = "#000"; //按鈕字體顏色復原
+    window.clearInterval(snakeTimer); //取消由setInterval()方法設置的計時器
+    for(var i = 0; i < brakeTimers.length; i++) {
+        window.clearTimeout(brakeTimers[i]); //刹車, 取消由setTimeout()方法設置的timeout及其帶來的行為
+    }
+    for(var i = 0; i < skateTimers.length; i++) {
+        window.clearTimeout(skateTimers[i]); //滑板, 取消由setTimeout()方法設置的timeout及其帶來的行為
+    }
+    //trace("GAME OVER");
+    //分數存檔
+    alert(overMsg);
+    saveScore(topScore);
+    //document.frames('scoreiframe').location.reload();
+    
+    return false; //停止Javascript的處理程式
+}
+
+function saveScore(iScore)
+{
+	var Player = document.getElementById('player_id').value;
+	$.ajax({
+	    url: "/www/main/page/save",
+	    method:"post",
+	    data: {score:iScore,player_id:Player}
+	}).done(function(result) {
+		if(result){
+			window.frames['scoreiframe'].location.reload();
+			window.frames['rankiframe'].location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+//蛇行走控制
+//建立TIMER,step實體動作函數
+function walk()
+{
+    if(snakeTimer) {
+        window.clearInterval(snakeTimer); //取消由setInterval()方法設置的計時器
+    }
+    snakeTimer = window.setInterval(step, Math.floor(3000 / speed)); //按照指定的週期(以毫秒計)來調用函數或計算運算式, 參數1(step函數): 為重複動作的程式碼，參數2: 則是延遲時間
+}
+//產生隨機整數
+function randowNum(start, end)
+{
+    return Math.floor(Math.random() * (end - start)) + start;
+}
+
+//產生0~3的變數
+function randNum()
+{
+    //Math.random()->0~1
+    //(Math.random() * 10)->0~9
+    //(Math.random() * 10) % 4->0~3
+    //Math.floor()->取整數
+    return Math.floor((Math.random() * 10) % 4);
+}
+//添加亂數量刹車和滑板
+function addRandomBrake()
+{
+    var num = randowNum(1, 5);
+    for(var i = 0; i < num; i++) {
+        brakeTimers.push(window.setTimeout(function(){ addObject("brake") }, randowNum(10000, 100000))); //刹車, 按照一定週期調用計時函數
+        skateTimers.push(window.setTimeout(function(){ addObject("skate") }, randowNum(5000, 100000))); //滑板, 按照一定週期調用計時函數
+    }
+}
+//遊戲開始
+function start()
+{//遊戲的開始
+    //len = randNum() + 1; //蛇的隨機長度[1~4]
+    len = 3;
+    if(len==0){
+    	len = 1;
+    }
+    speed = 10; //蛇的爬行速度 = 10 (1000 ms = 1 second)
+    directkey = 36 + len; //隨機決定方向[37~40]
+    topScore = len; //分數
+    carrier = multiArray(WIDTH, HEIGHT); //承載物件 = 二維陣列(WIDTH, HEIGHT)
+    snake = new Array(); //宣告一個新的陣列
+    clear(); //清除畫布
+    initSnake(); //蛇初始化
+    addObject("food"); //添加食物
+    walk(); //蛇行走[啟動TIMER]
+    addRandomBrake(); //添加刹車和滑板
+    trace("出發ヽ（・∀・）ノ"); //顯示文字
+    trace(topScore, $id("score")); //最高分
+}
+
+//添加鍵盤事件
+//只把按鍵值記錄到變數，並回傳FALSE達到讓網頁不處理該按鍵事件(事件屏蔽)
+function attachEvents(e)
+{
+    e = e || event;
+
+    //非方向鍵、反向無效
+    if(chkDirect){
+    	directkey = Math.abs(e.keyCode - directkey) != 2 && e.keyCode > 36 && e.keyCode < 41 ? e.keyCode : directkey; 
+    	chkDirect = false;
+    }
+    
+
+    return false; //停止Javascript的處理程式
+}
+
+//程式的進入點
+window.onload = function()
+{
+    info = $id("say");
+    initGrid("snakeWrap"); //網格初始化
+    document.onkeydown = attachEvents; //綁定方向事件
+    btnStart = $id("btnStart");
+    btnStart.onclick = function (e) {
+        btnStart.blur(); //firefox中必須釋放焦點
+        btnStart.setAttribute("disabled", true);
+        btnStart.style.color = "#696969"; //中等亮度的灰色陰影
+        start(); //遊戲開始
+    }
+    window.setInterval("reloadIFrame();", 30000);
+}
+
+function reloadIFrame() {
+ 	window.frames['rankiframe'].location.reload();
+}
+</script>

@@ -15,110 +15,6 @@
 		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
 		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
-		<script type="text/javascript">
-		function del_click(iUserId)
-		{
-			$.ajax({
-			  url: "/www/user/list/delete",
-			  method:"post",
-			  data: {UserId:iUserId}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		function disable_click(iUserId)
-		{
-			$.ajax({
-			  url: "/www/user/list/disable",
-			  method:"post",
-			  data: {UserId:iUserId}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		function enable_click(iUserId)
-		{
-			$.ajax({
-			  url: "/www/user/list/enable",
-			  method:"post",
-			  data: {UserId:iUserId}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		function edit_click(iUserId,iUsername,iUserLevel)
-		{
-			if(iUserLevel==3){
-				$("#edit_level").prop("checked",true);
-			}else{
-				$("#edit_level").prop("checked",false);
-			}
-			$('#edit_username').text(iUsername);
-			//$('#edit_content').text(iUserLevel);
-			$('#edit_userid').val(iUserId);
-		}
-
-		function edit_submit()
-		{
-			var edit_level = 0;
-			if($("#edit_level").prop('checked')){
-				edit_level = 3;
-			}else{
-				edit_level = 5;
-			}
-			var edit_aid = $('#edit_userid').val();
-     		$.ajax({
-			  	url: "/www/user/list/update",
-			  	method:"post",
-			  	data: {UserId:edit_aid,UserLevel:edit_level}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-			});
-		}
-
-		function changePage(iPage)
-		{
-			$.ajax({
-			  	url: "/www/user/list/changepage",
-			  	method:"post",
-			  	data: {page:iPage}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-			});
-		}
-
-		</script>
 		<title>使用者管理</title>
 	</head>
 	<body>
@@ -173,40 +69,21 @@
 				               {{/if}}
 				               <li><a href="/www/main/page">Snakegame</a></li>
 				           	</ul>
-				           	<div align="right" style="margin-top:20px;">Hi,{{$session_name}} (
-				           		<font style="color:#A9A9A9; ">
-								{{if ($session_level)==0}}
-								    最高權限
-								{{elseif ($session_level)==3}}
-									管理者
-								{{elseif ($session_level)==5}}
-									一般使用者
-								{{elseif ($session_level)==9}}
-									停權中
-								{{/if}}
-								</font>
-				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
+				           	<div align="right" style="margin-top:20px;">
+				           		Hi,{{$session_name}} (<font style="color:#A9A9A9;">{{$session_level_nm}}</font>)
+				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
+				            </div>
 				       	</div><!-- /.navbar-collapse -->
 					</div>
 				   	<!-- /.container-fluid -->
 				</nav>
 				<!--分頁處理Start-->
 				<ul class="pagination">
-					{{if ($page==1)}}
-						{{$prePage=1}}
-					{{else}}
-						{{$prePage=$page-1}}
-					{{/if}}
-					{{if ($page==$pagecnt)}}
-						{{$nextPage=$pagecnt}}
-					{{else}}
-						{{$nextPage=$page+1}}
-					{{/if}}
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
 					{{for $idx=1 to $pagecnt}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
 				</ul>
 				<!--分頁處理End-->
 				<table class="table table-striped">
@@ -232,15 +109,8 @@
 							{{$item.user_email}}
 						</td>
 						<td align="left" nowrap>
-							{{if ($item.user_level)==0}}
-							    最高權限
-							{{elseif ($item.user_level)==3}}
-								管理者
-							{{elseif ($item.user_level)==5}}
-								一般使用者
-							{{elseif ($item.user_level)==9}}
-								停權中
-							{{/if}}
+							{{$item.user_level_nm}}
+						</td>
 						<td align="left" nowrap>
 							{{if ($item.user_level)>0 && $session_level==0}}
 								{{if ($item.user_level!=9)}}
@@ -264,25 +134,118 @@
 				</table>
 				<!--分頁處理Start-->
 				<ul class="pagination">
-					{{if ($page==1)}}
-						{{$prePage=1}}
-					{{else}}
-						{{$prePage=$page-1}}
-					{{/if}}
-					{{if ($page==$pagecnt)}}
-						{{$nextPage=$pagecnt}}
-					{{else}}
-						{{$nextPage=$page+1}}
-					{{/if}}
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
 					{{for $idx=1 to $pagecnt}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
 				</ul>
 				<!--分頁處理End-->
 			</div>
 		</form>
 	</body>
 </html>
+<script type="text/javascript">
+function del_click(iUserId)
+{
+	$.ajax({
+	  url: "/www/user/list/delete",
+	  method:"post",
+	  data: {UserId:iUserId}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
 
+function disable_click(iUserId)
+{
+	$.ajax({
+	  url: "/www/user/list/disable",
+	  method:"post",
+	  data: {UserId:iUserId}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+function enable_click(iUserId)
+{
+	$.ajax({
+	  url: "/www/user/list/enable",
+	  method:"post",
+	  data: {UserId:iUserId}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+function edit_click(iUserId,iUsername,iUserLevel)
+{
+	if(iUserLevel==3){
+		$("#edit_level").prop("checked",true);
+	}else{
+		$("#edit_level").prop("checked",false);
+	}
+	$('#edit_username').text(iUsername);
+	//$('#edit_content').text(iUserLevel);
+	$('#edit_userid').val(iUserId);
+}
+
+function edit_submit()
+{
+	var edit_level = 0;
+	if($("#edit_level").prop('checked')){
+		edit_level = 3;
+	}else{
+		edit_level = 5;
+	}
+	var edit_aid = $('#edit_userid').val();
+		$.ajax({
+	  	url: "/www/user/list/update",
+	  	method:"post",
+	  	data: {UserId:edit_aid,UserLevel:edit_level}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+	});
+}
+
+function changePage(iPage)
+{
+	$.ajax({
+	  	url: "/www/user/list/changepage",
+	  	method:"post",
+	  	data: {page:iPage}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+	});
+}
+
+</script>

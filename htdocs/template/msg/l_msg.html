@@ -16,176 +16,6 @@
 		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
 
-		<script type="text/javascript">
-		function submintClick()
-		{
-			var UserId = $('#UserId').val().trim();
-			var Msg_Content = $('#Msg_Content').val().trim();
-
-			if(Msg_Content==''){
-				alert('留言內容不得為空值,請確認!');
-				return false;
-			}else{
-				if(chk(Msg_Content)){
-					add_click(UserId,Msg_Content);
-				}else{
-					alert("包含特殊字元,請修正!"); 
-					return false;
-				}
-			}
-		}
-
-		function chk(str)
-		{
-			var pass = true;
-			var ch;
-			var stralarm = new Array("<",">");
-			for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
-				for (var j=0;j<str.length;j++){
-					ch=str.substr(j,1);
-					if (ch==stralarm[i]){
-						//如果包含禁止字元
-						pass = false; //設置此變數為true
-					}
-				} 
-			}
-			return pass;
-		}
-
-		function add_click(iUsrId,iMsgContent)
-		{
-			if(confirm('確定新增以下內容?\n'+iMsgContent)){
-				$.ajax({
-				  url: "/www/msg/list/insert",
-				  method:"post",
-				  data: {user_id:iUsrId,msgcontent:iMsgContent}
-				}).done(function(result) {
-					//alert(result);
-					if(result){
-						location.reload();
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-			}else{
-				return false;
-			}
-			
-		}
-
-		function reply_click(iUsrId,iUserName,iPMsgId){
-
-			$('#reply_user_id').val(iUsrId);
-			$('#pmsg_id').val(iPMsgId);
-			$('#reply_user_name').text(iUserName);
-			
-		}
-
-		function reply_submit(){
-
-			var MsgContent = $('#reply_content').val();
-			var UsrId = $('#reply_user_id').val();
-			var PMsgId = $('#pmsg_id').val();
-
-			if(confirm('確定回覆以下內容?\n'+MsgContent)){
-				$.ajax({
-				  	url: "/www/msg/list/insert",
-				  	method:"post",
-				  	data: {user_id:UsrId,msgcontent:MsgContent,pmsg_id:PMsgId}
-				}).done(function(result) {
-					//alert(result);
-					if(result){
-						location.href='/www/msg/list/msglist';
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-			}else{
-				return false;
-			}
-						
-		}
-
-		function del_click(iMsgId)
-		{
-			if (confirm('確認刪除嗎?')) {
-				$.ajax({
-				    url: "/www/msg/list/delete",
-				    method:"post",
-				    data: {msg_id:iMsgId}
-				}).done(function(result){
-					if(result){
-						location.reload();
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-			} else {
-				return false;
-			}
-			
-		}
-
-		function edit_click(iUserName,iMsgContent,iMsgId)
-		{
-			$('#edit_user').text(iUserName);
-			$('#edit_content').text(iMsgContent);
-			$('#edit_aid').val(iMsgId);
-		}
-
-		function edit_submit()
-		{
-			var edit_content = $('#edit_content').val();
-			if(!chk(edit_content)){
-				alert("包含特殊字元,請修正!");
-				return false;
-			}
-
-			if(confirm('確定修改為以下內容?\n'+edit_content)){
-				var edit_aid = $('#edit_aid').val();
-         		$.ajax({
-				  	url: "/www/msg/list/update",
-				  	method:"post",
-				  	data: {msg_id:edit_aid,msgcontent:edit_content}
-				}).done(function(result) {
-					if(result){
-						location.reload();
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-			}else{
-				return false;
-			}
-			
-		}
-
-		function changePage(iPage)
-		{
-			$.ajax({
-			  	url: "/www/msg/list/changepage",
-			  	method:"post",
-			  	data: {page:iPage}
-			}).done(function(result) {
-				if(result){
-					location.href='/www/msg/list/msglist';
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		</script>
 		<title>留言板</title>
 		<style type="text/css">
 	        .box{
@@ -216,7 +46,7 @@
 		</style> 
 	</head>
 	<body>
-		<form method="post" action="n_msg.php" name="msgForm" id="msgForm">
+		<form method="post" name="msgForm" id="msgForm">
 			<!-- Modal -->
 			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 				<div class="modal-dialog" role="document">
@@ -260,6 +90,8 @@
 										<span name="reply_user_name" id="reply_user_name"></span>
 										<input type="hidden" name="reply_user_id" id="reply_user_id"/>
 										<input type="hidden" name="pmsg_id" id="pmsg_id"/>
+										<input type="hidden" name="reply_private" id="reply_private"/>
+										<input type="hidden" name="reply_receiver" id="reply_receiver"/>
 									</td>
 								</tr>
 								<tr>
@@ -299,38 +131,46 @@
 				               {{/if}}
 				               <li><a href="/www/main/page">Snakegame</a></li>
 				           	</ul>
-				           	<div align="right" style="margin-top:20px;">Hi,{{$session_name}} (
-				           		<font style="color:#A9A9A9; ">
-								{{if ($session_level)==0}}
-								    最高權限
-								{{elseif ($session_level)==3}}
-									管理者
-								{{elseif ($session_level)==5}}
-									一般使用者
-								{{elseif ($session_level)==9}}
-									停權中
-								{{/if}}
-								</font>
-				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
+				           	<div align="right" style="margin-top:20px;">
+				           		Hi,{{$session_name}} (<font style="color:#A9A9A9; ">{{$session_level_nm}}</font>)
+				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
+				            </div>
 				       	</div><!-- /.navbar-collapse -->
 					</div>
 				   	<!-- /.container-fluid -->
 				</nav>
 				{{if ($session_id!='')}}
-				<table class="table table-striped">
+				<table class="table" style="">
 					<tr>
-						<td align="right" nowrap>暱稱:</td>
-						<td align="left">
+						<td class="table" align="center">
 							{{$session_name}}
 							<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" nowrap>內容:</td>
-						<td align="left"><textarea class="form-control" name="Msg_Content" id="Msg_Content"></textarea></td>
+						<td class="table" align="center">
+							<label for="private_fg">
+								<input type="checkbox" class="form-check-input" name="private_fg" id="private_fg" value="1"/>悄悄話<font style="color:red;font-size: 8px;"><br>(勾選後,管理者仍然可看見留言內容,請勿違法交易,謝謝配合)</font>
+							</label>
+						</td>
 					</tr>
 					<tr>
-						<td colspan="2" align="right">
+						<td class="table">
+							對象
+							<select name="user_select_list" id="user_select_list" class="form-control" autocomplete="on"> 
+								<option value="0">無指定對象</option>
+							    {{$userselectliststr}}
+							</select>
+							<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
+						</td>
+					</tr>
+					<tr>
+						<td class="table">內容
+							<textarea class="form-control" name="Msg_Content" id="Msg_Content"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
 							<input type="button" class="form-control btn-primary" name="submit_btn" id="submit_btn" value="送出" onclick="submintClick();"/>
 						</td>
 					</tr>
@@ -339,93 +179,49 @@
 				{{/if}}
 				<!--分頁處理Start-->
 				<ul class="pagination">
-					{{if ($page==1)}}
-						{{$prePage=1}}
-					{{else}}
-						{{$prePage=$page-1}}
-					{{/if}}
-					{{if ($page==$pagecnt)}}
-						{{$nextPage=$pagecnt}}
-					{{else}}
-						{{$nextPage=$page+1}}
-					{{/if}}
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
 					{{for $idx=1 to $pagecnt}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
 				</ul>
 				<!--分頁處理End-->
 				<table class="table img-rounded">
 					{{foreach from=$msglist item=item}}
-						{{if $item.user_id==$session_id}}
-						{{$className='box box-blue'}}
-						{{else}}
-						{{$className='box box-gray'}}
-						{{/if}}
 					<tr >
-						<td align="left" {{$bgColor}} class="{{$className}}" style="border: 0px;">
-							<font style="font-size:20px;font-weight:bold;">
-							{{if ($item.user_id==0)}}
-							使用者已刪除
-							{{else}}
-							{{$item.user_name}}
-							{{/if}}
-                            </font>
+						<td align="left" {{$bgColor}} class="{{$item.className}}" style="border: 0px;">
+							<font style="font-size:20px;font-weight:bold;">{{$item.user_name}} {{$item.receiver_nm}}</font>
 							{{if ($session_id==$item.user_id)}}
 							<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','{{$item.msg_content}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
 							{{/if}}
 							{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
 							<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
 							{{/if}}
-							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
+							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
 							<br>
-							<font style="font-size:10px;color:#A9A9A9;">
-							{{if ($item.user_level)==0}}
-							    最高權限
-							{{elseif ($item.user_level)==3}}
-								管理者
-							{{elseif ($item.user_level)==5}}
-								一般使用者
-							{{elseif ($item.user_level)==9}}
-								停權中
-							{{/if}}
-							</font><br>
-							<font style="font-size:16px;">{{$item.msg_content}}</font><br><br>
+							<font style="font-size:10px;color:#A9A9A9;">{{$item.user_level_nm}}</font>
+							<br>
+							<font style="font-size:16px;">{{$item.msg_content}}</font>
+							<br><br>
 							<font style="font-size:10px;">{{$item.msg_dtm}}</font>
 							<br>
 							{{foreach from=$replymsglist item=replyitem}}
 								{{if $replyitem.pmsg_id==$item.msg_id}}
-									{{if $replyitem.user_id==$session_id}}
-									{{$replyclassName='box box-blue'}}
-									{{else}}
-									{{$replyclassName='box box-gray'}}
-									{{/if}}
+								<br>
+								<div class="{{$replyitem.className}}" style="margin-left:50px;">
+								    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
+								    {{if ($session_id==$replyitem.user_id)}}
+								    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+								    {{/if}}
+								    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
+								    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+								    {{/if}}
+								    <br>
+								    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">{{$replyitem.user_level_nm}}</font>
 									<br>
-									<div class="{{$replyclassName}}" style="margin-left:50px;">
-									    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
-									    {{if ($session_id==$replyitem.user_id)}}
-									    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
-									    {{/if}}
-									    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
-									    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
-									    {{/if}}
-									    <br>
-									    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">
-										{{if ($replyitem.user_level)==0}}
-										    最高權限
-										{{elseif ($replyitem.user_level)==3}}
-											管理者
-										{{elseif ($replyitem.user_level)==5}}
-											一般使用者
-										{{elseif ($replyitem.user_level)==9}}
-											停權中
-										{{/if}}
-										</font>
-										<br>
-									    <font class="reply" style="font-size:14px;">{{$replyitem.msg_content}}</font><br><br>
-										<font class="reply" style="font-size:8px;">{{$replyitem.msg_dtm}}</font>
-									</div>
+								    <font class="reply" style="font-size:14px;">{{$replyitem.msg_content}}</font><br><br>
+									<font class="reply" style="font-size:8px;">{{$replyitem.msg_dtm}}</font>
+								</div>
 								{{/if}}
 							{{/foreach}}
 						</td>
@@ -437,25 +233,198 @@
 				</table>
 				<!--分頁處理Start-->
 				<ul class="pagination">
-					{{if ($page==1)}}
-						{{$prePage=1}}
-					{{else}}
-						{{$prePage=$page-1}}
-					{{/if}}
-					{{if ($page==$pagecnt)}}
-						{{$nextPage=$pagecnt}}
-					{{else}}
-						{{$nextPage=$page+1}}
-					{{/if}}
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prePage}}');">«</a></li>
+					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
 					{{for $idx=1 to $pagecnt}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextPage}}');">»</a></li>
+					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
 				</ul>
 				<!--分頁處理End-->
 			</div>
 		</form>
 	</body>
 </html>
+<script type="text/javascript">
+function submintClick()
+{
+	var UserId = $('#UserId').val().trim();
+	var Msg_Content = $('#Msg_Content').val().trim();
+
+	if(Msg_Content==''){
+		alert('留言內容不得為空值,請確認!');
+		return false;
+	}else{
+		if(chk(Msg_Content)){
+			add_click(UserId,Msg_Content);
+		}else{
+			alert("包含特殊字元,請修正!"); 
+			return false;
+		}
+	}
+}
+
+function chk(str)
+{
+	var pass = true;
+	var ch;
+	var stralarm = new Array("<",">");
+	for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
+		for (var j=0;j<str.length;j++){
+			ch=str.substr(j,1);
+			if (ch==stralarm[i]){
+				//如果包含禁止字元
+				pass = false; //設置此變數為true
+			}
+		} 
+	}
+	return pass;
+}
+
+function add_click(iUsrId,iMsgContent)
+{
+	if(confirm('確定新增以下內容?\n'+iMsgContent)){
+
+		//是否為悄悄話
+		var private_fg;
+		if($('#private_fg').prop('checked')){
+			private_fg = 1;
+		}else{
+			private_fg = 0;
+		}
+		var receiver = $('#user_select_list').val();
+		//console.log('private_fg=['+private_fg+']');
+		$.ajax({
+		  url: "/www/msg/list/insert",
+		  method:"post",
+		  data: {user_id:iUsrId,msgcontent:iMsgContent,private_fg:private_fg,receiver:receiver}
+		}).done(function(result) {
+			//alert(result);
+			if(result){
+				location.reload();
+			}else{
+				alert('error');
+				return false;
+			}
+			
+		});
+	}else{
+		return false;
+	}
+	
+}
+
+function reply_click(iUsrId,iUserName,iPMsgId,iPrivate,iReceiver){
+	$('#reply_user_id').val(iUsrId);
+	$('#pmsg_id').val(iPMsgId);
+	$('#reply_user_name').text(iUserName);
+	$('#reply_private').val(iPrivate);
+	$('#reply_receiver').val(iReceiver);
+	
+}
+
+function reply_submit(){
+
+	var MsgContent = $('#reply_content').val();
+	var UsrId = $('#reply_user_id').val();
+	var PMsgId = $('#pmsg_id').val();
+	var ReplyPrivate = $('#reply_private').val();
+	var ReplyReceiver = $('#reply_receiver').val();
+
+	if(confirm('確定回覆以下內容?\n'+MsgContent)){
+		$.ajax({
+		  	url: "/www/msg/list/insert",
+		  	method:"post",
+		  	data: {user_id:UsrId,msgcontent:MsgContent,pmsg_id:PMsgId,private_fg:ReplyPrivate,receiver:ReplyReceiver}
+		}).done(function(result) {
+			//alert(result);
+			if(result){
+				location.href='/www/msg/list/msglist';
+			}else{
+				alert('error');
+				return false;
+			}
+			
+		});
+	}else{
+		return false;
+	}
+				
+}
+
+function del_click(iMsgId)
+{
+	if (confirm('確認刪除嗎?')) {
+		$.ajax({
+		    url: "/www/msg/list/delete",
+		    method:"post",
+		    data: {msg_id:iMsgId}
+		}).done(function(result){
+			if(result){
+				location.reload();
+			}else{
+				alert('error');
+				return false;
+			}
+			
+		});
+	} else {
+		return false;
+	}
+	
+}
+
+function edit_click(iUserName,iMsgContent,iMsgId)
+{
+	$('#edit_user').text(iUserName);
+	$('#edit_content').text(iMsgContent);
+	$('#edit_aid').val(iMsgId);
+}
+
+function edit_submit()
+{
+	var edit_content = $('#edit_content').val();
+	if(!chk(edit_content)){
+		alert("包含特殊字元,請修正!");
+		return false;
+	}
+
+	if(confirm('確定修改為以下內容?\n'+edit_content)){
+		var edit_aid = $('#edit_aid').val();
+ 		$.ajax({
+		  	url: "/www/msg/list/update",
+		  	method:"post",
+		  	data: {msg_id:edit_aid,msgcontent:edit_content}
+		}).done(function(result) {
+			if(result){
+				location.reload();
+			}else{
+				alert('error');
+				return false;
+			}
+			
+		});
+	}else{
+		return false;
+	}
+	
+}
+
+function changePage(iPage)
+{
+	$.ajax({
+	  	url: "/www/msg/list/changepage",
+	  	method:"post",
+	  	data: {page:iPage}
+	}).done(function(result) {
+		if(result){
+			location.href='/www/msg/list/msglist';
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+</script>
 

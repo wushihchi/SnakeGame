@@ -18,10 +18,11 @@ class Main_Page_Ctl extends Controller
             unset($oModel);
 
             return Smarty_View::make('main/mainframe.html', array(
-                'scorelist'  => $aScoreList,
-                'user_id'    => $_SESSION['user_id'],
-                'user_name'  => $_SESSION['user_name'],
-                'user_level' => $_SESSION['user_level']
+                'scorelist'        => $aScoreList,
+                'session_id'       => $_SESSION['user_id'],
+                'session_name'     => $_SESSION['user_name'],
+                'session_level'    => $_SESSION['user_level'],
+                'session_level_nm' => $this->getLevelName($_SESSION['user_level']),
             ));
             //return Smarty_View::make('main/mainframe.html', array('pagename'=>$_SESSION['pagename'],'player_id'=>$_SESSION['player_id'],'player_nm'=>$_SESSION['player_nm']));
         } else {
@@ -177,6 +178,28 @@ class Main_Page_Ctl extends Controller
         }
         
         return $leftStr.str_repeat('*', $len-$right-$left).$rightStr;
+    }
+
+    public function getLevelName($iLevel)
+    {
+        switch ($iLevel)
+        {
+            case 0:
+                return '最高權限';
+                break;  
+            case 3:
+                return '管理者';
+                break;  
+            case 5:
+                return '一般使用者';
+                break;  
+            case 9:
+                return '停權中';
+                break;  
+            default:
+                return '一般使用者';
+                break;
+        }
     }
 }
 

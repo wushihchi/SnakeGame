@@ -11,6 +11,8 @@ class Angeldb_MsgBoard_Model extends MyDBModel
         'pmsg_id'      => 'int',
         'user_id'      => 'int',
         'msg_content'  => 'string',
+        'private_fg'   => 'bool',
+        'receiver'     => 'int',
         'msg_dtm'      => 'datetime',
     );
 

@@ -15,127 +15,6 @@
 		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
 		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
-		<script type="text/javascript">
-		function submintClick()
-		{
-			var UserId = $('#UserId').val().trim();
-			var Msg_Content = $('#Msg_Content').val().trim();
-
-			if(Msg_Content==''){
-				alert('留言內容不得為空值,請確認!');
-				return false;
-			}else{
-				if(chk(Msg_Content)){
-					add_click(UserId,Msg_Content);
-				}else{
-					alert("包含特殊字元,請修正!"); 
-					return false;
-				}
-			}
-		}
-
-		function chk(str)
-		{
-			var pass = true;
-			var ch;
-			var stralarm = new Array("<",">");
-			for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
-				for (var j=0;j<str.length;j++){
-					ch=str.substr(j,1);
-					if (ch==stralarm[i]){
-						//如果包含禁止字元
-						pass = false; //設置此變數為true
-					}
-				} 
-			}
-			return pass;
-		}
-
-		function add_click(iUsrId,iMsgContent)
-		{
-			$.ajax({
-			  url: "/www/msg/list/insert",
-			  method:"post",
-			  data: {sUsrId:iUsrId,sMsgContent:iMsgContent}
-			}).done(function(result) {
-				//alert('result='+result);
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		function del_click(iMsgId)
-		{
-			$.ajax({
-			  url: "/www/msg/list/delete",
-			  method:"post",
-			  data: {sMsgId:iMsgId}
-			}).done(function(result){
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		function edit_click(iUserId,iMsgContent,iMsgId)
-		{
-			$('#edit_user').text(iUserId);
-			$('#edit_content').text(iMsgContent);
-			$('#edit_aid').val(iMsgId);
-		}
-
-		function edit_submit()
-		{
-			var edit_content = $('#edit_content').val();
-			if(chk(edit_content)){
-				var edit_aid = $('#edit_aid').val();
-         		$.ajax({
-				  	url: "/www/msg/list/update",
-				  	method:"post",
-				  	data: {sMsgId:edit_aid,sMsgContent:edit_content}
-				}).done(function(result) {
-					if(result){
-						location.reload();
-					}else{
-						alert('error');
-						return false;
-					}
-					
-				});
-			}else{
-				alert("包含特殊字元,請修正!");
-				return false;
-			}
-			
-		}
-
-		function changePage(iPage)
-		{
-			$.ajax({
-			  	url: "/www/msg/list/changepage",
-			  	method:"post",
-			  	data: {page:iPage}
-			}).done(function(result) {
-				if(result){
-					location.reload();
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-
-		</script>
 		<title>貪食蛇</title>
 	</head>
 	<body>
@@ -165,20 +44,11 @@
 				               <li class="active"><a href="/www/main/page">Snakegame</a></li>
 				               <li></li>
 				           	</ul>
-				           	<div align="right" style="margin-top:20px;">Hi,{{$user_name}} (
-				           		<font style="color:#A9A9A9; ">
-								{{if ($user_level)==0}}
-								    最高權限
-								{{elseif ($user_level)==3}}
-									管理者
-								{{elseif ($user_level)==5}}
-									一般使用者
-								{{elseif ($user_level)==9}}
-									停權中
-								{{/if}}
-								</font>
-				           	)&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a></div>
-				           	
+				            <div align="right" style="margin-top:20px;">
+				           		Hi,{{$session_name}} (<font style="color:#A9A9A9;">{{$session_level_nm}}</font>)
+				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
+				            </div>
+
 				       	</div><!-- /.navbar-collapse -->
 					</div>
 				   	<!-- /.container-fluid -->
@@ -188,4 +58,124 @@
 		</form>
 	</body>
 </html>
+<script type="text/javascript">
+function submintClick()
+{
+	var UserId = $('#UserId').val().trim();
+	var Msg_Content = $('#Msg_Content').val().trim();
 
+	if(Msg_Content==''){
+		alert('留言內容不得為空值,請確認!');
+		return false;
+	}else{
+		if(chk(Msg_Content)){
+			add_click(UserId,Msg_Content);
+		}else{
+			alert("包含特殊字元,請修正!"); 
+			return false;
+		}
+	}
+}
+
+function chk(str)
+{
+	var pass = true;
+	var ch;
+	var stralarm = new Array("<",">");
+	for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
+		for (var j=0;j<str.length;j++){
+			ch=str.substr(j,1);
+			if (ch==stralarm[i]){
+				//如果包含禁止字元
+				pass = false; //設置此變數為true
+			}
+		} 
+	}
+	return pass;
+}
+
+function add_click(iUsrId,iMsgContent)
+{
+	$.ajax({
+	  url: "/www/msg/list/insert",
+	  method:"post",
+	  data: {sUsrId:iUsrId,sMsgContent:iMsgContent}
+	}).done(function(result) {
+		//alert('result='+result);
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+function del_click(iMsgId)
+{
+	$.ajax({
+	  url: "/www/msg/list/delete",
+	  method:"post",
+	  data: {sMsgId:iMsgId}
+	}).done(function(result){
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+function edit_click(iUserId,iMsgContent,iMsgId)
+{
+	$('#edit_user').text(iUserId);
+	$('#edit_content').text(iMsgContent);
+	$('#edit_aid').val(iMsgId);
+}
+
+function edit_submit()
+{
+	var edit_content = $('#edit_content').val();
+	if(chk(edit_content)){
+		var edit_aid = $('#edit_aid').val();
+ 		$.ajax({
+		  	url: "/www/msg/list/update",
+		  	method:"post",
+		  	data: {sMsgId:edit_aid,sMsgContent:edit_content}
+		}).done(function(result) {
+			if(result){
+				location.reload();
+			}else{
+				alert('error');
+				return false;
+			}
+			
+		});
+	}else{
+		alert("包含特殊字元,請修正!");
+		return false;
+	}
+	
+}
+
+function changePage(iPage)
+{
+	$.ajax({
+	  	url: "/www/msg/list/changepage",
+	  	method:"post",
+	  	data: {page:iPage}
+	}).done(function(result) {
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+
+</script>

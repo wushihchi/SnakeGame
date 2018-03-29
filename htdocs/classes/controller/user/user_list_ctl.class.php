@@ -27,17 +27,36 @@ class User_List_Ctl extends Controller
                 'limit' => $iLimit2.','.$iPageSize
             ));
 
+            foreach ($aUserList as $iKey => $aValue) {
+                $aUserList[$iKey]['user_level_nm'] = $this->getLevelName($aUserList[$iKey]['user_level']);
+            }
+
             unset($oModel);
 
+            if ($iPage == 1) {
+                $iPrePage = 1;
+            }else{
+                $iPrePage = $iPage - 1;
+            }
+
+            if ($iPage == $iPageCnt){
+                $iNextPage = $iPageCnt;
+            }else{
+                $iNextPage = $iPage + 1;
+            }
+
             return Smarty_View::make('user/l_user.html', array(
-                'userlist'      => $aUserList,
-                'pagename'      => $_SESSION['pagename'],
-                'session_id'    => $_SESSION['user_id'],
-                'session_name'  => $_SESSION['user_name'],
-                'session_level' => $_SESSION['user_level'],
-                'page'          => $iPage,
-                'pagesize'      => $iPageSize,
-                'pagecnt'       => $iPageCnt
+                'userlist'         => $aUserList,
+                'pagename'         => $_SESSION['pagename'],
+                'session_id'       => $_SESSION['user_id'],
+                'session_name'     => $_SESSION['user_name'],
+                'session_level'    => $_SESSION['user_level'],
+                'session_level_nm' => $this->getLevelName($_SESSION['user_level']),
+                'page'             => $iPage,
+                'pagesize'         => $iPageSize,
+                'pagecnt'          => $iPageCnt,
+                'prepage'          => $iPrePage,
+                'nextpage'         => $iNextPage
             ));
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
@@ -82,8 +101,8 @@ class User_List_Ctl extends Controller
             //使用者刪除,留言人跟著變成0
             $oMsgModel = new Angeldb_MsgBoard_Model;
             $iUpdateCnt = $oMsgModel->update(
-                array('user_id'=> 0),
-                array('user_id'=> $sUserId)
+                array('user_id' => 0),
+                array('user_id' => $sUserId)
             );
 
             unset($oMsgModel);
@@ -94,7 +113,7 @@ class User_List_Ctl extends Controller
                 return false;
             }
         } else {
-            return Smarty_View::make('login/login.html',array('pagename' => 'login'));
+            return Smarty_View::make('login/login.html', array('pagename' => 'login'));
         }
     }
 
@@ -118,7 +137,7 @@ class User_List_Ctl extends Controller
             }
             
         }else{
-            return Smarty_View::make('login/login.html',array('pagename' => 'login'));
+            return Smarty_View::make('login/login.html', array('pagename' => 'login'));
         }
     }
 
@@ -168,6 +187,28 @@ class User_List_Ctl extends Controller
         $iPage = Input::post('i', 'page');
         $_SESSION['userpage'] = $iPage;
         return true;
+    }
+
+    public function getLevelName($iLevel)
+    {
+        switch ($iLevel)
+        {
+            case 0:
+                return '最高權限';
+                break;  
+            case 3:
+                return '管理者';
+                break;  
+            case 5:
+                return '一般使用者';
+                break;  
+            case 9:
+                return '停權中';
+                break;  
+            default:
+                return '一般使用者';
+                break;
+        }
     }
 
 }

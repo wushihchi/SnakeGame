@@ -25,7 +25,7 @@ class Msg_List_Ctl extends Controller
             $iLimit2 = $iPageSize*($iPage-1);
             
             $aMsgList = $oMsgModel->find(array('pmsg_id' => 0), array(
-                'field' => 'msg_id, user_id, msg_content, msg_dtm',
+                'field' => 'msg_id, user_id, msg_content, private_fg, receiver, msg_dtm',
                 'order' => 'msg_dtm desc',
                 'limit' => $iLimit2.','.$iPageSize
             ));
@@ -47,34 +47,142 @@ class Msg_List_Ctl extends Controller
                 array()
             );
 
-            
+            //第三個參數,放user_id或是receiver結果都一樣,就先不管了
+            $aReceiver = $oMsgModel->find_col('receiver',array(),array('field' => 'user_id'));
+            //return $aReceiver;
+            $aReceiverNameList = $oUserModel->find_pair(
+                'user_id',
+                'user_name',
+                array('user_id'=>$aReceiver),
+                array()
+            );
+            //return json_encode($aReceiverNameList);
+            echo '<pre>';
+            print_r($aMsgList);
+            //exit;
             foreach ($aMsgList as $iKey => $aValue) {
-                $aMsgList[$iKey]['user_name'] = $aUserNameList[$aMsgList[$iKey]['user_id']];
-                $aMsgList[$iKey]['user_level'] = $aUserLevelList[$aMsgList[$iKey]['user_id']];
-            }
 
+                $sPrivate = "";
+                if($aMsgList[$iKey]['private_fg'] == true){
+                    $sPrivate = "[悄悄話]";
+                }
+
+                if($aMsgList[$iKey]['private_fg'] == true &&
+                    !(
+                    $aMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
+                    $aMsgList[$iKey]['user_id'] == $_SESSION['user_id']
+                    )
+                ){
+                    $aMsgList[$iKey]['user_name'] = "悄悄話";
+                    $aMsgList[$iKey]['msg_content'] = "悄悄話";
+                    $aMsgList[$iKey]['receiver_nm'] = "";
+                    $aMsgList[$iKey]['user_level_nm'] = "";
+                }else{
+                    if($aMsgList[$iKey]['user_id'] == 0){
+                        $aMsgList[$iKey]['user_name'] = "使用者已刪除";
+                    }else{
+                        $aMsgList[$iKey]['user_name'] = $aUserNameList[$aMsgList[$iKey]['user_id']];
+                    }
+
+                    if($aReceiverNameList[$aMsgList[$iKey]['receiver']] != ''){
+                        $aMsgList[$iKey]['receiver_nm'] = " to ".$aReceiverNameList[$aMsgList[$iKey]['receiver']];
+                    }
+                    
+                    $aMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
+                }
+
+                $aMsgList[$iKey]['user_level'] = $aUserLevelList[$aMsgList[$iKey]['user_id']];
+                //$aMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aMsgList[$iKey]['receiver']];
+                if($aMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
+                    $aMsgList[$iKey]['className'] = 'box box-blue';
+                }else{
+                    $aMsgList[$iKey]['className'] = 'box box-gray';
+                }
+
+
+            }
+            
             foreach ($aReplyMsgList as $iKey => $aValue) {
-                $aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
+                $sPrivate = "";
+                if($aReplyMsgList[$iKey]['private_fg'] == true){
+                    $sPrivate = "[悄悄話]";
+                }
+                if($aReplyMsgList[$iKey]['private_fg'] == true &&
+                    !(
+                    $aReplyMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
+                    $aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']
+                    )
+                ){
+                    $aReplyMsgList[$iKey]['user_name'] = "悄悄話";
+                    $aReplyMsgList[$iKey]['msg_content'] = "悄悄話";
+                    $aReplyMsgList[$iKey]['receiver_nm'] = "";
+                    $aReplyMsgList[$iKey]['user_level_nm'] = "";
+                }else{
+                    if($aReplyMsgList[$iKey]['user_id'] == 0){
+                        $aReplyMsgList[$iKey]['user_name'] = "使用者已刪除";
+                    }else{
+                        $aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
+                    }
+
+                    // if($aReceiverNameList[$aReplyMsgList[$iKey]['receiver']] != ''){
+                    //     $aReplyMsgList[$iKey]['receiver_nm'] = " to ".$aReceiverNameList[$aReplyMsgList[$iKey]['receiver']];
+                    // }
+                    
+                    $aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']).'  '.$sPrivate;
+                }
+
+                //$aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
                 $aReplyMsgList[$iKey]['user_level'] = $aUserLevelList[$aReplyMsgList[$iKey]['user_id']];
+                //$aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']);
+                //$aReplyMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aReplyMsgList[$iKey]['receiver']];
+                if($aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
+                    $aReplyMsgList[$iKey]['className'] = 'box box-blue';
+                }else{
+                    $aReplyMsgList[$iKey]['className'] = 'box box-gray';
+                }
+            }
+            
+
+
+            $aUserSelectList = $oUserModel->userListMsg();
+            $sUserSelectListStr = "";
+            foreach ($aUserSelectList as $iKey => $aValue) {
+                $sUserSelectListStr = $sUserSelectListStr."<option value='".$aUserSelectList[$iKey]['user_id']."'>".$aUserSelectList[$iKey]['user_name'].'</option>';
             }
 
             // echo '<pre>';
-            // print_r($aReplyMsgList);
-            //exit;
+            // print_r($sUserSelectListStr);
+            // exit;
             //return json_encode($aMsgList);
             unset($oMsgModel);
             unset($oUserModel);
 
+            if ($iPage == 1) {
+                $iPrePage = 1;
+            }else{
+                $iPrePage = $iPage - 1;
+            }
+
+            if ($iPage == $iPageCnt){
+                $iNextPage = $iPageCnt;
+            }else{
+                $iNextPage = $iPage + 1;
+            }
+
             return Smarty_View::make('msg/l_msg.html', array(
-                'msglist'       => $aMsgList,
-                'replymsglist'  => $aReplyMsgList,
-                'msgCnt'        => $iMsgCnt,
-                'session_id'    => $_SESSION['user_id'],
-                'session_name'  => $_SESSION['user_name'],
-                'session_level' => $_SESSION['user_level'],
-                'page'          => $iPage,
-                'pagesize'      => $iPageSize,
-                'pagecnt'       => $iPageCnt
+                'msglist'            => $aMsgList,
+                'replymsglist'       => $aReplyMsgList,
+                'msgCnt'             => $iMsgCnt,
+                'userselectliststr'  => $sUserSelectListStr,
+                'session_id'         => $_SESSION['user_id'],
+                'session_name'       => $_SESSION['user_name'],
+                'session_level'      => $_SESSION['user_level'],
+                'session_level_nm'   => $this->getLevelName($_SESSION['user_level']),
+                'page'               => $iPage,
+                'pagesize'           => $iPageSize,
+                'pagecnt'            => $iPageCnt,
+                'prepage'            => $iPrePage,
+                'nextpage'           => $iNextPage
             ));
         }else{
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
@@ -88,6 +196,10 @@ class Msg_List_Ctl extends Controller
             $sMsgContent = str_replace("'","''",Input::post('s', 'msgcontent'));
             $iUsrId = Input::post('i', 'user_id');
             $iPMsgId = Input::post('i', 'pmsg_id');
+            $bPrivateFg = Input::post('b', 'private_fg');
+            $iReceiver = Input::post('i', 'receiver');
+
+            if($bPrivateFg != true) $bPrivateFg = false;
 
             $oModel = new Angeldb_MsgBoard_Model;
 
@@ -96,12 +208,16 @@ class Msg_List_Ctl extends Controller
                     'user_id'     => $iUsrId,
                     'pmsg_id'     => $iPMsgId,
                     'msg_content' => $sMsgContent,
+                    'private_fg'  => $bPrivateFg,
+                    'receiver'    => $iReceiver,
                     'msg_dtm'     => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
                 ));
             }else{
                 $primary_key = $oModel->insert(array(
                     'user_id'     => $iUsrId,
                     'msg_content' => $sMsgContent,
+                    'private_fg'  => $bPrivateFg,
+                    'receiver'    => $iReceiver,
                     'msg_dtm'     => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
                 ));
             }
@@ -187,4 +303,25 @@ class Msg_List_Ctl extends Controller
         return true;
     }
 
+    public function getLevelName($iLevel)
+    {
+        switch ($iLevel)
+        {
+            case 0:
+                return '最高權限';
+                break;  
+            case 3:
+                return '管理者';
+                break;  
+            case 5:
+                return '一般使用者';
+                break;  
+            case 9:
+                return '停權中';
+                break;  
+            default:
+                return '一般使用者';
+                break;
+        }
+    }
 }
