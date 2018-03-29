@@ -67,6 +67,7 @@ class Msg_List_Ctl extends Controller
                     $sPrivate = "[悄悄話]";
                 }
 
+                $aMsgList[$iKey]['user_level'] = $aUserLevelList[$aMsgList[$iKey]['user_id']];
                 if($aMsgList[$iKey]['private_fg'] == true &&
                     !($aMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
                     $aMsgList[$iKey]['user_id'] == $_SESSION['user_id']) &&
@@ -92,8 +93,6 @@ class Msg_List_Ctl extends Controller
                     $aMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
                     $aMsgList[$iKey]['allow_reply'] = true;
                 }
-
-                $aMsgList[$iKey]['user_level'] = $aUserLevelList[$aMsgList[$iKey]['user_id']];
                 //$aMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aMsgList[$iKey]['receiver']];
                 if($aMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
                     $aMsgList[$iKey]['className'] = 'box box-blue';
@@ -109,6 +108,8 @@ class Msg_List_Ctl extends Controller
                 if($aReplyMsgList[$iKey]['private_fg'] == true){
                     $sPrivate = "[悄悄話]";
                 }
+
+                $aReplyMsgList[$iKey]['user_level'] = $aUserLevelList[$aReplyMsgList[$iKey]['user_id']];
                 if($aReplyMsgList[$iKey]['private_fg'] == true &&
                     !($aReplyMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
                     $aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']) &&
@@ -134,7 +135,7 @@ class Msg_List_Ctl extends Controller
                 }
 
                 //$aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
-                $aReplyMsgList[$iKey]['user_level'] = $aUserLevelList[$aReplyMsgList[$iKey]['user_id']];
+                
                 //$aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']);
                 //$aReplyMsgList[$iKey]['receiver_nm'] = $aReceiverNameList[$aReplyMsgList[$iKey]['receiver']];
                 if($aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
