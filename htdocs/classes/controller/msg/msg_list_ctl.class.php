@@ -108,10 +108,10 @@ class Msg_List_Ctl extends Controller
                     $sPrivate = "[悄悄話]";
                 }
                 if($aReplyMsgList[$iKey]['private_fg'] == true &&
-                    !(
-                    $aReplyMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
-                    $aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']
-                    )
+                    !($aReplyMsgList[$iKey]['receiver'] == $_SESSION['user_id'] ||
+                    $aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']) &&
+                    $_SESSION['user_id'] != 3 &&
+                    $_SESSION['user_id'] != 0
                 ){
                     $aReplyMsgList[$iKey]['user_name'] = "悄悄話";
                     $aReplyMsgList[$iKey]['msg_content'] = "悄悄話";
