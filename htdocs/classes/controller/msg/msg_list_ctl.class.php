@@ -140,7 +140,8 @@ class Msg_List_Ctl extends Controller
             $aUserSelectList = $oUserModel->userListMsg();
             $sUserSelectListStr = "";
             foreach ($aUserSelectList as $iKey => $aValue) {
-                if($aUserSelectList[$iKey]['user_level'] != '2'){
+                if($aUserSelectList[$iKey]['user_level'] != '2' &&
+                $aUserSelectList[$iKey]['user_name']){
                     $sUserSelectListStr = $sUserSelectListStr."<option value='".$aUserSelectList[$iKey]['user_id']."'>".$aUserSelectList[$iKey]['user_name'].'</option>';
                 }
                 

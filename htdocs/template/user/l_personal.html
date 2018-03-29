@@ -65,9 +65,9 @@
 				           	<ul class="nav navbar-nav">
 				               <li ><a href="/www/msg/list/msglist">MessageBoard</a></li>
 				               {{if ($session_level==0||$session_level==3)}}
-				               <li class="active"><a href="/www/user/list/userlist">UserPage</a></li>
-				               {{/if}}
-				               <li><a href="/www/user/personal/personalpage">PersonalPage</a></li>
+				               <li><a href="/www/user/list/userlist">UserPage</a></li>
+				               {{/if}} 
+				               <li class="active"><a href="/www/user/personal/personalpage">PersonalPage</a></li>
 				               <li><a href="/www/main/page">Snakegame</a></li>
 				           	</ul>
 				           	<div align="right" style="margin-top:20px;">
@@ -78,175 +78,107 @@
 					</div>
 				   	<!-- /.container-fluid -->
 				</nav>
-				<!--分頁處理Start-->
-				<ul class="pagination">
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
-					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
-					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
-				</ul>
-				<!--分頁處理End-->
-				<table class="table table-striped">
+				<table class="table">
 					<tr>
-						<th nowrap>UserID</th>
-						<th nowrap>UserName</th>
-						<th nowrap>UserEmail</th>
-						<th nowrap>UserLevel</th>
-						{{if $session_level==0}}
-						<th nowrap>UserStatus</th>
-						{{/if}}
-						<th nowrap></th>
+						<td nowrap>
+							{{$userinfo[0]['user_name']}}&nbsp;&nbsp;<{{$userinfo[0]['user_level_nm']}}>
+						</td>
 					</tr>
-					{{foreach from=$userlist item=item}}
 					<tr>
-						<td align="left" nowrap>
-							{{$item.user_id}}
+						<td nowrap>
+							{{$userinfo[0]['user_email']}}
 						</td>
-						<td align="left" nowrap>
-							{{$item.user_name}}
-						</td>
-						<td align="left" nowrap>
-							{{$item.user_email}}
-						</td>
-						<td align="left" nowrap>
-							{{$item.user_level_nm}}
-						</td>
-						<td align="left" nowrap>
-							{{if ($item.user_level)>0 && $session_level==0}}
-								{{if ($item.user_level!=9)}}
-								啟用中<a href="#" title="停用" onclick="disable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-close"></span></a>
-								{{/if}}
-
-								{{if ($item.user_level==9)}}
-								停用中<a href="#" title="啟用" onclick="enable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-check"></span></a>
-								{{/if}}
-							{{/if}}
-						</td>
-						{{if $session_level==0}}
-						<td align="left" nowrap>
-							{{if ($item.user_level)>0}}
-							<a href="#" title="管理" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_id}}','{{$item.user_name}}','{{$item.user_level}}');"><span class="ui-icon ui-icon-pencil"></span></a>
-							{{/if}}
-						</td>
-						{{/if}}
 					</tr>
-					{{/foreach}}
+					<tr>
+						<td>
+                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">
+							    修改密碼
+                            </button>    
+                            <div id="demo" class="collapse">
+                            	舊密碼<input type="password" class="form-control" placeholder="請輸入舊密碼" name="oldpwd" id="oldpwd"/><br>
+							   	新密碼<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd1" id="userPwd1"/><br>
+							   	新密碼確認<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd2" id="userPwd2"/>
+								<input type="hidden" name="newpwd" id="newpwd"/><br>
+								<button type="button" class="btn btn-primary" onclick="btnclick();">
+								    確認
+	                            </button>
+	                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">
+							    	取消
+                           		</button>  
+                            </div>
+						</td>
+					</tr>
+					
 				</table>
-				<!--分頁處理Start-->
-				<ul class="pagination">
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
-					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
-					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
-				</ul>
-				<!--分頁處理End-->
 			</div>
 		</form>
 	</body>
 </html>
 <script type="text/javascript">
-function del_click(iUserId)
-{
-	$.ajax({
-	  url: "/www/user/list/delete",
-	  method:"post",
-	  data: {UserId:iUserId}
-	}).done(function(result) {
-		if(result){
-			location.reload();
-		}else{
-			alert('error');
-			return false;
-		}
-		
-	});
-}
-
-function disable_click(iUserId)
-{
-	$.ajax({
-	  url: "/www/user/list/disable",
-	  method:"post",
-	  data: {UserId:iUserId}
-	}).done(function(result) {
-		if(result){
-			location.reload();
-		}else{
-			alert('error');
-			return false;
-		}
-		
-	});
-}
-
-function enable_click(iUserId)
-{
-	$.ajax({
-	  url: "/www/user/list/enable",
-	  method:"post",
-	  data: {UserId:iUserId}
-	}).done(function(result) {
-		if(result){
-			location.reload();
-		}else{
-			alert('error');
-			return false;
-		}
-		
-	});
-}
-
-function edit_click(iUserId,iUsername,iUserLevel)
-{
-	if(iUserLevel==3){
-		$("#edit_level").prop("checked",true);
-	}else{
-		$("#edit_level").prop("checked",false);
+function btnclick(){
+	if(!chkoldpwd()){
+		alert('密碼錯誤');
+		return false;
 	}
-	$('#edit_username').text(iUsername);
-	//$('#edit_content').text(iUserLevel);
-	$('#edit_userid').val(iUserId);
-}
 
-function edit_submit()
-{
-	var edit_level = 0;
-	if($("#edit_level").prop('checked')){
-		edit_level = 3;
-	}else{
-		edit_level = 5;
+	if(!chkpwd()){
+		return false;
 	}
-	var edit_aid = $('#edit_userid').val();
-		$.ajax({
-	  	url: "/www/user/list/update",
+
+	$.ajax({
+	  	url: "/www/user/personal/changepwd",
 	  	method:"post",
-	  	data: {UserId:edit_aid,UserLevel:edit_level}
+	  	async:false,
+	  	data: {userPwd:$('#newpwd').val()}
 	}).done(function(result) {
 		if(result){
 			location.reload();
 		}else{
 			alert('error');
-			return false;
 		}
 	});
 }
 
-function changePage(iPage)
+function chkoldpwd()
 {
+	var rtnVal;
 	$.ajax({
-	  	url: "/www/user/list/changepage",
+	  	url: "/www/user/personal/chkoldpwd",
 	  	method:"post",
-	  	data: {page:iPage}
+	  	async:false,
+	  	data: {userPwd:$('#oldpwd').val()}
 	}).done(function(result) {
+
 		if(result){
-			location.reload();
+			rtnVal = true;
 		}else{
-			alert('error');
-			return false;
+			rtnVal = false;
 		}
 	});
+
+	return rtnVal;
+}
+
+function chkpwd()
+{
+	if($('#userPwd1').val().trim()==''||$('#userPwd2').val().trim()==''){
+		alert('密碼與確認密碼皆須輸入，請確認!');
+		return false;
+	}
+
+	if($('#userPwd1').val()!=$('#userPwd2').val()){
+		alert('密碼與確認密碼輸入不一致，請確認!');
+		return false;
+	}
+
+	$('#newpwd').val($('#userPwd1').val());
+
+	if($('#newpwd').val()==$('#oldpwd').val()){
+		alert('新密碼不得與舊密碼相同，請確認!');
+		return false;
+	}else{
+		return false;
+	}
 }
 
 </script>
