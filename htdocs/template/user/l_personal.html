@@ -1,24 +1,34 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
-		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		
 		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
-		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css"> <!-- 載入 Bootstrap -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
 		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
-		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+
+<link href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" rel="stylesheet">
+
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
-		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
-		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
-		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
-		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
-		<title>使用者管理</title>
+		<title>PersonalPage</title>
+		<style type="text/css">
+		body{
+			font-family: '微軟正黑體';
+		}
+
+		.box-gray{
+			border-radius: 10px;
+			border: #CCCCCC 0px solid;
+			background-color: #F2F2F2;
+			color: #4D4D4D;
+		}
+		</style>
 	</head>
 	<body>
-		<form method="post" name="userForm" id="userForm">
+		<div class="container">
 			<!-- Modal -->
 			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 				<div class="modal-dialog" role="document">
@@ -44,77 +54,101 @@
 				    </div>
 				</div>
 			</div>
+			<nav class="navbar navbar-default" role="navigation">
+			   	<div class="container-fluid">
+			       	<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header">
+			           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+			data-target="#bs-example-navbar-collapse-1" >
+			               <span class="sr-only">Toggle navigation</span>
+			               <span class="icon-bar"></span>
+			               <span class="icon-bar"></span>
+			               <span class="icon-bar"></span>
+			           	</button>
+			       		<!-- Collect the nav links, forms, and other content for toggling -->
+			        	<!--a class="navbar-brand" href="#"><image style="height:100px;" src="/www/assets/vendor/images/mermaid.png"></image></a-->
+			        	<a class="navbar-brand" href="#">Hi,{{$session_name}} (<font style="color:#A9A9A9; ">{{$session_level_nm}}</font>)</a>
+			       </div>
 
-			<div class="container">
-				<nav class="navbar navbar-default" role="navigation">
-				   	<div class="container-fluid">
-				       	<!-- Brand and toggle get grouped for better mobile display -->
-						<div class="navbar-header">
-				           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-				data-target="#bs-example-navbar-collapse-1" >
-				               <span class="sr-only">Toggle navigation</span>
-				               <span class="icon-bar"></span>
-				               <span class="icon-bar"></span>
-				               <span class="icon-bar"></span>
-				           	</button>
-				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
-				       </div>
+			       <!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			           	<ul class="nav navbar-nav navbar-right">
+			                <li><a href="/www/msg/list/msglist">MessageBoard</a></li>
+			                {{if ($session_level==0||$session_level==3)}}
+			                <li><a href="/www/user/list/userlist">UserPage</a></li>
+			                {{/if}}
+			                <li class="active"><a href="/www/user/personal/personalpage">PersonalPage</a></li>
+			                <li><a href="/www/main/page">Snakegame</a></li>
+			                <li><a href="/www/login/page/logout">Logout</a></li>
+			           	</ul>
+			       	</div><!-- /.navbar-collapse -->
+				</div>
+			   	<!-- /.container-fluid -->
+			</nav>
+			<table class="table box-gray">
+				<tr>
+					<td nowrap>
+						{{$userinfo[0]['user_name']}}&nbsp;&nbsp;<{{$userinfo[0]['user_level_nm']}}>
+					</td>
+				</tr>
+				<tr>
+					<td nowrap>
+						{{$userinfo[0]['user_email']}}
+					</td>
+				</tr>
+				<tr>
+					<td nowrap>
+						系統訊息狀態&nbsp;&nbsp;
+						{{if ($userinfo[0]['showsysmsg']==1)}}
+						<a href="#" title="隱藏" onclick="showsysmsg(0);"><font style="color: green;">顯示</font><span class="ui-icon ui-icon-close"></span></a>
+						{{/if}}
 
-				       <!-- Collect the nav links, forms, and other content for toggling -->
-						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				           	<ul class="nav navbar-nav">
-				               <li ><a href="/www/msg/list/msglist">MessageBoard</a></li>
-				               {{if ($session_level==0||$session_level==3)}}
-				               <li><a href="/www/user/list/userlist">UserPage</a></li>
-				               {{/if}} 
-				               <li class="active"><a href="/www/user/personal/personalpage">PersonalPage</a></li>
-				               <li><a href="/www/main/page">Snakegame</a></li>
-				           	</ul>
-				           	<div align="right" style="margin-top:20px;">
-				           		Hi,{{$session_name}} (<font style="color:#A9A9A9;">{{$session_level_nm}}</font>)
-				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
-				            </div>
-				       	</div><!-- /.navbar-collapse -->
-					</div>
-				   	<!-- /.container-fluid -->
-				</nav>
-				<table class="table">
-					<tr>
-						<td nowrap>
-							{{$userinfo[0]['user_name']}}&nbsp;&nbsp;<{{$userinfo[0]['user_level_nm']}}>
-						</td>
-					</tr>
-					<tr>
-						<td nowrap>
-							{{$userinfo[0]['user_email']}}
-						</td>
-					</tr>
-					<tr>
-						<td>
-                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">
-							    修改密碼
-                            </button>    
-                            <div id="demo" class="collapse">
-                            	舊密碼<input type="password" class="form-control" placeholder="請輸入舊密碼" name="oldpwd" id="oldpwd"/><br>
-							   	新密碼<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd1" id="userPwd1"/><br>
-							   	新密碼確認<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd2" id="userPwd2"/>
-								<input type="hidden" name="newpwd" id="newpwd"/><br>
-								<button type="button" class="btn btn-primary" onclick="btnclick();">
-								    確認
-	                            </button>
-	                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">
-							    	取消
-                           		</button>  
-                            </div>
-						</td>
-					</tr>
-					
-				</table>
-			</div>
-		</form>
+						{{if ($userinfo[0]['showsysmsg']==0)}}
+						<a href="#" title="顯示" onclick="showsysmsg(1);"><font style="color: red;">隱藏</font><span class="ui-icon ui-icon-check"></span></a>
+						{{/if}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">
+						    修改密碼
+                        </button>    
+                        <div id="demo" class="collapse">
+                        	舊密碼<input type="password" class="form-control" placeholder="請輸入舊密碼" name="oldpwd" id="oldpwd"/><br>
+						   	新密碼<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd1" id="userPwd1"/><br>
+						   	新密碼確認<input type="password" class="form-control" placeholder="請輸入新密碼" name="userPwd2" id="userPwd2"/>
+							<input type="hidden" name="newpwd" id="newpwd"/><br>
+							<button type="button" class="btn btn-primary" onclick="btnclick();">
+							    確認
+                            </button>
+                            <button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo">
+						    	取消
+                       		</button>  
+                        </div>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</body>
 </html>
 <script type="text/javascript">
+function showsysmsg(iOpen)
+{
+	$.ajax({
+	  url: "/www/user/personal/showsysmsg",
+	  method:"post",
+	  data: {open:iOpen}
+	}).done(function(result) {
+		//alert(result);
+		if(result){
+			location.reload();
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
 function btnclick(){
 	if(!chkoldpwd()){
 		alert('密碼錯誤');
@@ -132,6 +166,7 @@ function btnclick(){
 	  	data: {userPwd:$('#newpwd').val()}
 	}).done(function(result) {
 		if(result){
+			alert('修改成功!');
 			location.reload();
 		}else{
 			alert('error');
@@ -177,7 +212,7 @@ function chkpwd()
 		alert('新密碼不得與舊密碼相同，請確認!');
 		return false;
 	}else{
-		return false;
+		return true;
 	}
 }
 

@@ -1,21 +1,22 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
-		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
-		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css"> <!-- 載入 Bootstrap -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
 		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
-		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
-		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
-		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
-		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
-		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
-		<title>使用者管理</title>
+		<title>UserPage</title>
+		<style type="text/css">
+			body{
+				font-family: '微軟正黑體';
+			}
+		</style>
 	</head>
 	<body>
 		<form method="post" name="userForm" id="userForm">
@@ -57,23 +58,22 @@
 				               <span class="icon-bar"></span>
 				               <span class="icon-bar"></span>
 				           	</button>
-				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
+				       		<!-- Collect the nav links, forms, and other content for toggling -->
+				        	<!--a class="navbar-brand" href="#"><image style="height:100px;" src="/www/assets/vendor/images/mermaid.png"></image></a-->
+				        	<a class="navbar-brand" href="#">Hi,{{$session_name}} (<font style="color:#A9A9A9; ">{{$session_level_nm}}</font>)</a>
 				       </div>
 
 				       <!-- Collect the nav links, forms, and other content for toggling -->
 						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				           	<ul class="nav navbar-nav">
-				               <li ><a href="/www/msg/list/msglist">MessageBoard</a></li>
-				               {{if ($session_level==0||$session_level==3)}}
-				               <li class="active"><a href="/www/user/list/userlist">UserPage</a></li>
-				               {{/if}}
-				               <li><a href="/www/user/personal/personalpage">PersonalPage</a></li>
-				               <li><a href="/www/main/page">Snakegame</a></li>
+				           	<ul class="nav navbar-nav navbar-right">
+				                <li><a href="/www/msg/list/msglist">MessageBoard</a></li>
+				                {{if ($session_level==0||$session_level==3)}}
+				                <li class="active"><a href="/www/user/list/userlist">UserPage</a></li>
+				                {{/if}}
+				                <li><a href="/www/user/personal/personalpage">PersonalPage</a></li>
+				                <li><a href="/www/main/page">Snakegame</a></li>
+				                <li><a href="/www/login/page/logout">Logout</a></li>
 				           	</ul>
-				           	<div align="right" style="margin-top:20px;">
-				           		Hi,{{$session_name}} (<font style="color:#A9A9A9;">{{$session_level_nm}}</font>)
-				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
-				            </div>
 				       	</div><!-- /.navbar-collapse -->
 					</div>
 				   	<!-- /.container-fluid -->
@@ -81,7 +81,7 @@
 				<!--分頁處理Start-->
 				<ul class="pagination">
 					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
+					{{for $idx=$showpagestart to $showpageend}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
 					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
@@ -115,11 +115,11 @@
 						<td align="left" nowrap>
 							{{if ($item.user_level)>0 && $session_level==0}}
 								{{if ($item.user_level!=9)}}
-								啟用中<a href="#" title="停用" onclick="disable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-close"></span></a>
+								<a href="#" title="停用" onclick="disable_click('{{$item.user_id}}');"><font style="color: green;">啟用中</font><span class="ui-icon ui-icon-close"></span></a>
 								{{/if}}
 
 								{{if ($item.user_level==9)}}
-								停用中<a href="#" title="啟用" onclick="enable_click('{{$item.user_id}}');"><span class="ui-icon ui-icon-check"></span></a>
+								<a href="#" title="啟用" onclick="enable_click('{{$item.user_id}}');"><font style="color: red;">停用中</font><span class="ui-icon ui-icon-check"></span></a>
 								{{/if}}
 							{{/if}}
 						</td>
@@ -136,7 +136,7 @@
 				<!--分頁處理Start-->
 				<ul class="pagination">
 					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
+					{{for $idx=$showpagestart to $showpageend}}
 					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
 					{{/for}}
 					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>

@@ -12,10 +12,13 @@ class Angeldb_User_Model extends MyDBModel
         'user_email'   => 'string',
         'user_pwd'     => 'string',
         'user_level'   => 'int',
+        'showsysmsg'   => 'bool',
     );
 
-    public function userListMsg() {
+    public function userListMsg()
+    {
     	$sql = "SELECT * FROM `User` WHERE `user_level` != 9 ORDER BY `user_name` ASC";
     	return $this->select_all($sql); 
     }
+
 }

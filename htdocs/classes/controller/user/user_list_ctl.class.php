@@ -9,7 +9,16 @@ class User_List_Ctl extends Controller
 
     public function get_userlist()
     {
-        if ($this->chkSession() && ($_SESSION['user_level'] == 3 || $_SESSION['user_level'] == 0)) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession() && ($_SESSION['user_level'] == 3 || $_SESSION['user_level'] == 0)) {
+            $_SESSION['pagename'] = 'user';
+            if (!isset($_SESSION['userpage'])) {
+                $_SESSION['userpage'] = 1;
+            }
+            if (!isset($_SESSION['userpagesize'])) {
+                $_SESSION['userpagesize'] = 5;
+            }
+
             $oModel = new Angeldb_User_Model;
 
             $iPage = $_SESSION['userpage'];
@@ -28,7 +37,7 @@ class User_List_Ctl extends Controller
             ));
 
             foreach ($aUserList as $iKey => $aValue) {
-                $aUserList[$iKey]['user_level_nm'] = $this->getLevelName($aUserList[$iKey]['user_level']);
+                $aUserList[$iKey]['user_level_nm'] = $oInclude->getLevelName($aUserList[$iKey]['user_level']);
             }
 
             unset($oModel);
@@ -45,14 +54,34 @@ class User_List_Ctl extends Controller
                 $iNextPage = $iPage + 1;
             }
 
+            if($iPage <= 5){
+                $iShowPageStart = 1;
+                if($iPageCnt > 10){
+                    $iShowPageEnd = 10;
+                }else{
+                    $iShowPageEnd = $iPageCnt;
+                }
+            }else{
+                if($iPage + 5 > $iPageCnt){
+                    $iShowPageStart = $iPageCnt - 9;
+                    $iShowPageEnd = $iPageCnt;
+                }else{
+                    $iShowPageStart = $iPage - 4;
+                    $iShowPageEnd = $iPage + 5;
+                }
+                
+            }
+
             return Smarty_View::make('user/l_user.html', array(
                 'userlist'         => $aUserList,
                 'pagename'         => $_SESSION['pagename'],
                 'session_id'       => $_SESSION['user_id'],
                 'session_name'     => $_SESSION['user_name'],
                 'session_level'    => $_SESSION['user_level'],
-                'session_level_nm' => $this->getLevelName($_SESSION['user_level']),
+                'session_level_nm' => $oInclude->getLevelName($_SESSION['user_level']),
                 'page'             => $iPage,
+                'showpagestart'    => $iShowPageStart,
+                'showpageend'      => $iShowPageEnd,
                 'pagesize'         => $iPageSize,
                 'pagecnt'          => $iPageCnt,
                 'prepage'          => $iPrePage,
@@ -61,11 +90,13 @@ class User_List_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
     public function post_update()
     {
-        if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             $oModel = new Angeldb_User_Model;
 
             $sUserLevel = Input::post('s', 'UserLevel');
@@ -86,11 +117,13 @@ class User_List_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
     public function post_delete()
     {
-        if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             $oUserModel = new Angeldb_User_Model;
 
             $sUserId = Input::post('s', 'UserId');
@@ -115,11 +148,13 @@ class User_List_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html', array('pagename' => 'login'));
         }
+        unset($oInclude);
     }
 
     public function post_disable()
     {
-        if($this->chkSession()){
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
             $oModel = new Angeldb_User_Model;
             $sUserId = Input::post('s', 'UserId');
 
@@ -139,6 +174,7 @@ class User_List_Ctl extends Controller
         }else{
             return Smarty_View::make('login/login.html', array('pagename' => 'login'));
         }
+        unset($oInclude);
     }
 
     public function post_enable()
@@ -160,26 +196,6 @@ class User_List_Ctl extends Controller
         }
     }
 
-    private function chkSession()
-    {
-        session_start();
-        if ($_SESSION['user_id'] == '') {
-            $_SESSION['pagename'] = 'login';
-
-            return false;
-        } else {
-            $_SESSION['pagename'] = 'user';
-            if (!isset($_SESSION['userpage'])) {
-                $_SESSION['userpage'] = 1;
-            }
-            if (!isset($_SESSION['userpagesize'])) {
-                $_SESSION['userpagesize'] = 5;
-            }
-
-            return true;
-        }
-    }
-
     public function post_changepage()
     {
         session_start();
@@ -187,31 +203,6 @@ class User_List_Ctl extends Controller
         $iPage = Input::post('i', 'page');
         $_SESSION['userpage'] = $iPage;
         return true;
-    }
-
-    public function getLevelName($iLevel)
-    {
-        switch ($iLevel)
-        {
-            case 0:
-                return '最高權限';
-                break;    
-            case 2:
-                return '系統';
-                break;  
-            case 3:
-                return '管理者';
-                break;  
-            case 5:
-                return '一般使用者';
-                break;  
-            case 9:
-                return '停權中';
-                break;  
-            default:
-                return '一般使用者';
-                break;
-        }
     }
 
 }

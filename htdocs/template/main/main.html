@@ -1,17 +1,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
-		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
-		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
-		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
-		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
-		<script src="/www/assets/vendor/js/tether.min.js"></script>
-		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
-		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
-		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<title>貪食蛇</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/jquery-ui-1.12.1/jquery-ui.css">
+        <link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.3.7/css/bootstrap.min.css"> <!-- 載入 Bootstrap -->
+        <link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
+        <link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+
+        <script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
+        <script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
+        <script src="/www/assets/vendor/bootstrap/3.3.7/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
+        <script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+		<title>Snakegame</title>
 		<style type="text/css">
 		    * { margin:0; padding:0 }  
 		    body { 
@@ -22,7 +21,8 @@
 		    	background-size: cover;
 		    	-moz-user-select:none; 
 		    	text-align:center; 
-		    	font-size:12px
+		    	font-size:12px;
+                font-family: '微軟正黑體';
 		    } /*防止滑鼠拖拉*/
 		    table { margin:20px auto 10px auto; overflow:hidden; border-collapse:collapse }
 		    td { width:20px; height:20px; border:1px solid #696969; background:#000 }
@@ -32,8 +32,20 @@
 		    .block { background:gray } /*障礙:灰色*/
 		    .brake { background:#f00 } /*刹車:紅色*/
 		    .skate { background:#00f } /*滑板:藍色*/
-		    #say { margin-top:20px; color:red;font-weight:bold;font-size:36px; }
-		    #score { margin-top:25px; color:red;font-weight:bold;font-size:72px; }
+		    #say { 
+                margin-top:20px; 
+                color:red;
+                font-weight:bold;
+                font-size:36px; 
+                text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+            }
+		    #score { 
+                margin-top:25px; 
+                color:red;
+                font-weight:bold;
+                font-size:72px; 
+                text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
+            }
 		    #help { width:420px; margin:0 auto; line-height:17px; font-weight:bold;color:#000 }
 		    #help span { float:left; margin-right:10px }
 		    #help .box { width:15px; height:15px; margin-right:5px; border:0px solid #227700;}
@@ -87,17 +99,14 @@
 		 	 	</div>
 		  		<div class="col-sm-6">
 		  			<iframe allowTransparency="true" src="/www/main/page/rank" width="523px" height="580px" frameborder="0" scrolling="no" name="rankiframe" id="rankiframe"></iframe>
-		  			<br>
-		  			<iframe allowTransparency="true" src="/www/main/page/score" width="493px" height="350px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
+                    <br>
+                    <iframe allowTransparency="true" src="/www/main/page/score" width="493px" height="350px" frameborder="0" scrolling="no" name="scoreiframe" id="scoreiframe"></iframe>
 		  		</div>
 			</div>
 		</div>
 	</body>
 </html>
 <script type="text/javascript">
-//code by CNwander.
-//website at http://www.webjx.com/javascript/jsajax-16454.html
-//common
 function $id(str)
 {
     return document.getElementById(str);
@@ -358,9 +367,9 @@ function step()
 
 function gameOver()
 {
-	if(getText($id("score")) * 1 < len) {
-        trace(len, $id("score"));
-    }
+	// if(getText($id("score")) * 1 < len) {
+ //        trace(len, $id("score"));
+ //    }
     btnStart.removeAttribute("disabled"); //按鈕致能
     btnStart.style.color = "#000"; //按鈕字體顏色復原
     window.clearInterval(snakeTimer); //取消由setInterval()方法設置的計時器
@@ -441,7 +450,7 @@ function start()
     }
     speed = 10; //蛇的爬行速度 = 10 (1000 ms = 1 second)
     directkey = 36 + len; //隨機決定方向[37~40]
-    topScore = len; //分數
+    topScore = 0; //分數
     carrier = multiArray(WIDTH, HEIGHT); //承載物件 = 二維陣列(WIDTH, HEIGHT)
     snake = new Array(); //宣告一個新的陣列
     clear(); //清除畫布

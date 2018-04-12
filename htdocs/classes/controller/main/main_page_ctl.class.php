@@ -4,7 +4,9 @@ class Main_Page_Ctl extends Controller
 {
     public function get_index()
     {
-        if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
+            $_SESSION['pagename'] ='main';
             //取得最高分           
             $oModel = new Snakegame_Score_Model;
             
@@ -22,21 +24,21 @@ class Main_Page_Ctl extends Controller
                 'session_id'       => $_SESSION['user_id'],
                 'session_name'     => $_SESSION['user_name'],
                 'session_level'    => $_SESSION['user_level'],
-                'session_level_nm' => $this->getLevelName($_SESSION['user_level']),
+                'session_level_nm' => $oInclude->getLevelName($_SESSION['user_level']),
             ));
             //return Smarty_View::make('main/mainframe.html', array('pagename'=>$_SESSION['pagename'],'player_id'=>$_SESSION['player_id'],'player_nm'=>$_SESSION['player_nm']));
         } else {
             return Smarty_View::make('login/login.html');
         }
 
-
+        unset($oInclude);
        
     }
 
     public function get_iframepage()
     {
-
-        if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             return Smarty_View::make('main/main.html', array(
                 'pagename'  => $_SESSION['pagename'],
                 'user_id'   => $_SESSION['user_id'],
@@ -45,13 +47,12 @@ class Main_Page_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html');
         }
-
-
-       
+        unset($oInclude);
     }
     public function get_score()
     {
-         if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             //取得最高分
             $oModel = new Snakegame_Score_Model;
            
@@ -67,12 +68,13 @@ class Main_Page_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html');
         }
-        
+        unset($oInclude);
     }
 
     public function get_rank()
     {
-         if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             //取得最高分
             $oModel = new Snakegame_Score_Model;
             
@@ -96,7 +98,7 @@ class Main_Page_Ctl extends Controller
             foreach ($aScoreList as $iKey => $aValue) {
                 $sTempPlayerNm = $aPlayerList[$aScoreList[$iKey]['player_id']];
                 if ($aScoreList[$iKey]['player_id'] != $_SESSION['user_id']) {
-                    $sTempPlayerNm = $this->maskString($sTempPlayerNm);
+                    $sTempPlayerNm = $oInclude->maskString($sTempPlayerNm);
                 }
                 $aScoreList[$iKey]['user_name'] = $sTempPlayerNm;                
             }
@@ -113,6 +115,7 @@ class Main_Page_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html');
         }
+        unset($oInclude);
         
     }
 
@@ -148,76 +151,5 @@ class Main_Page_Ctl extends Controller
         }
     }
 
-
-    private function chkSession()
-    {
-        session_start();
-
-        if ($_SESSION['user_id']=='') {
-            $_SESSION['pagename'] = 'login';
-            return false;
-        } else {
-            $_SESSION['pagename'] ='main';
-            
-            return true;
-        }
-    }
-
-    private function maskString($s)
-    {
-        $masknum = 3;
-        $len = strlen($s);
-        /*
-        if($masknum<0) {
-            $masknum = $len + $masknum;
-        }*/
-        if ($len < 3) {
-            return $s;
-        } elseif ($len < $masknum + 1) {
-            return substr($s, 0, 1).str_repeat('*',$len - 2).substr($s, -1);
-        }
-
-        $right = ($len - $masknum) >> 1;
-        if ($right == 0) {
-            $rightStr = "";
-        } else {
-            //$rightStr = substr($s,-$right);
-            $rightStr = str_repeat('*', $right);
-        }
-
-        $left = $len - $right - $masknum;
-        if ($left == 0) {
-            $leftStr = "";
-        } else {
-            $leftStr = substr($s, 0, $left);
-        }
-        
-        return $leftStr.str_repeat('*', $len-$right-$left).$rightStr;
-    }
-
-    public function getLevelName($iLevel)
-    {
-        switch ($iLevel)
-        {
-            case 0:
-                return '最高權限';
-                break;  
-            case 2:
-                return '系統';
-                break;  
-            case 3:
-                return '管理者';
-                break;  
-            case 5:
-                return '一般使用者';
-                break;  
-            case 9:
-                return '停權中';
-                break;  
-            default:
-                return '一般使用者';
-                break;
-        }
-    }
 }
 

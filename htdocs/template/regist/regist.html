@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
 		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
@@ -10,197 +11,216 @@
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
 		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<script type="text/javascript">
-		function submitFunc()
-		{
-			var userName = $('#userName').val().trim();
-			var userEmail = $('#userEmail').val().trim();
-			
-			//=====暱稱檢查=====Start
-			if(userName==''){
-				alert('暱稱未輸入，請確認!');
-				return false;
-			}
-			if(!ispermit(userName)){
-				alert('暱稱存在sql關鍵字，請重新輸入!');
-				return false;
-			}
-			if(userName.length<4){
-				alert('暱稱最少需四個字，請確認!');
-				return false;
-			}
-			if (!chkNameExist(userName)) {
-				alert('暱稱已存在,請重新輸入!');
-				return false;
-			}
-			//=====暱稱檢查=====End
-
-			//=====Email帳號檢查=====Start
-			if(userEmail==''){
-				alert('Email帳號未輸入，請確認!');
-				return false;
-			}
-			if(!ispermit(userEmail)){
-				alert('Email帳號存在sql關鍵字，請重新輸入!');
-				return false;
-			}
-            var emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
-
-			if (userEmail.search(emailRule)== -1) {
-				alert('Email格式錯誤,請確認!!');
-				return false;
-			}
-			if (!chkEmailExist(userEmail)) {
-				alert('Email已存在,請重新輸入!');
-				return false;
-			}
-			//=====Email帳號檢查=====End
-
-			if (!chkpwd()) {
-				return false;
-			}
-
-			
-			var userPwd = $('#userPwd').val();
-			regist_func(userName,userEmail,userPwd);
-
+		<style type="text/css">
+		body{
+			/*background-image : url('/www/assets/vendor/images/green-nature.jpg');*/
+	    	background-repeat:no-repeat;
+	    	background-attachment: fixed;
+        	background-position: center;
+	    	background-size: cover;
+			font-family: '微軟正黑體';
+			text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
 		}
-
-		function chkEmailExist(iuserEmail){
-			var RtnVal = true;
-			$.ajax({
-			 	url: "/www/regist/page/checkemailexist",
-				method:"post",
-				async:false,
-				data: {userEmail:iuserEmail}
-			}).done(function(result) {
-
-				if (result) {
-					RtnVal = true;
-				} else {
-					RtnVal = false;
-				}
-				
-			});
-			return RtnVal;
-		}
-
-		function chkNameExist(iuserName){
-			var RtnVal = true;
-			$.ajax({
-			 	url: "/www/regist/page/checknameexist",
-				method:"post",
-				async:false,
-				data: {userName:iuserName}
-			}).done(function(result) {
-				if (result) {
-					RtnVal = true;
-				} else {
-					RtnVal = false;
-				}
-			});
-			return RtnVal;
-		}
-
-		function ispermit(istr)
-		{
-			var RtnVal = true;
-			$.ajax({
-			 	url: "/www/regist/page/ispermit",
-				method:"post",
-				async:false,
-				data: {str:istr}
-			}).done(function(result) {
-				if (result) {
-					RtnVal = true;
-				} else {
-					RtnVal = false;
-				}
-				
-			});
-			return RtnVal;
-		}
-
-		//檢查密碼與密碼確認是否一致
-		function chkpwd()
-		{
-			if($('#userPwd1').val().trim()==''||$('#userPwd2').val().trim()==''){
-				alert('密碼與確認密碼皆須輸入，請確認!');
-				return false;
-			}else{
-				if($('#userPwd1').val()!=$('#userPwd2').val()){
-					alert('密碼與確認密碼輸入不一致，請確認!');
-					return false;
-				}else{
-					$('#userPwd').val($('#userPwd1').val());
-					return true;
-				}
-			}
-			
-		}
-
-		function regist_func(iUserName,iUserEmail,iUserPwd)
-		{
-			$.ajax({
-			    url: "/www/regist/page/insert",
-			    method:"post",
-			    data: {UserName:iUserName,UserEmail:iUserEmail,UserPwd:iUserPwd}
-			}).done(function(result) {
-				//alert(result);
-				if(result){
-					location.href = '/www/login/page';
-				}else{
-					alert('error');
-					return false;
-				}
-				
-			});
-		}
-		</script>
+		</style>
 	</head>
 	<body>
-		<form method="post" name="registForm" id="registForm">
-			<div class="container">
-				<br><br>
-				<div class="col-md-offset-4 col-md-4">
-					<table class="table">
-						<tr>
-							<td nowrap>
-								暱稱<input type="text" class="form-control" placeholder="輸入長度4以上" name="userName" id="userName"/>
-							</td>
-						</tr>
-						<tr>
-							<td nowrap>
-								Email帳號<input type="text" class="form-control" placeholder="請輸入Email" name="userEmail" id="userEmail"/>
-							</td>
-						</tr>
-						<tr>
-							<td nowrap>
-								密碼<input type="password" class="form-control" placeholder="請輸入密碼" name="userPwd1" id="userPwd1"/>
-								<input type="hidden" name="userPwd" id="userPwd"/>
-							</td>
-						</tr>
-						<tr>
-							<td nowrap>
-								密碼確認<input type="password" class="form-control" placeholder="密碼確認" name="userPwd2" id="userPwd2"/>
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<div class="btn-group btn-group-justified">
-									<div class="btn-group">
-								 		<input type="button" class="form-control btn-primary" name="" id="" value="返回登入頁" onclick="javascript:location.href='/www/login/page'">
-								 	</div>
-								 	<div class="btn-group">
-								   	 	<input type="button" class="form-control btn-primary" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
-								 	</div>
-								</div>
-							</td>
-						</tr>
-					</table>
-				</div>
+		<div class="container">
+			<br><br>
+			<div class="col-md-offset-4 col-md-4">
+				<table class="table">
+					<tr>
+						<td nowrap>
+							暱稱<input type="text" class="form-control" placeholder="輸入長度4以上(只允許英文或數字)" name="userName" id="userName"/>
+						</td>
+					</tr>
+					<tr>
+						<td nowrap>
+							Email帳號(日後做為登入使用)<input type="email" class="form-control" placeholder="請輸入Email(須符合Email格式)" name="userEmail" id="userEmail"/>
+						</td>
+					</tr>
+					<tr>
+						<td nowrap>
+							密碼<input type="password" class="form-control" placeholder="請輸入密碼(只允許英文或數字)" name="userPwd1" id="userPwd1"/>
+							<input type="hidden" name="userPwd" id="userPwd"/>
+						</td>
+					</tr>
+					<tr>
+						<td nowrap>
+							密碼確認<input type="password" class="form-control" placeholder="密碼確認(只允許英文或數字)" name="userPwd2" id="userPwd2"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<input type="button" class="form-control btn-primary" name="submitBtn" id="submitBtn" value="確認" onclick="submitFunc();">
+							<br><br>
+							已有帳號?<a href="/www/login/page">登入</a>
+						</td>
+					</tr>
+				</table>
 			</div>
-		</form>
+		</div>
 	</body>
 </html>
+<script type="text/javascript">
+function submitFunc()
+{
+	var userName = $('#userName').val().trim();
+	var userEmail = $('#userEmail').val().trim();
+	
+	//=====暱稱檢查=====Start
+	if(userName==''){
+		alert('暱稱未輸入，請確認!');
+		return false;
+	}
+	if(!ispermit(userName)){
+		alert('暱稱存在sql關鍵字，請重新輸入!');
+		return false;
+	}
+	if(userName.length<4){
+		alert('暱稱最少需四個字，請確認!');
+		return false;
+	}
+	if (!chkNameExist(userName)) {
+		alert('暱稱已存在,請重新輸入!');
+		return false;
+	}
+
+	var re = /^[a-zA-Z0-9]*$/;
+
+	if(!re.test(userName)){
+		alert('暱稱只能輸入英文或數字，請確認!');
+		return false;
+	}
+	//=====暱稱檢查=====End
+
+	//=====Email帳號檢查=====Start
+	if(userEmail==''){
+		alert('Email帳號未輸入，請確認!');
+		return false;
+	}
+	if(!ispermit(userEmail)){
+		alert('Email帳號存在sql關鍵字，請重新輸入!');
+		return false;
+	}
+    var emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+
+	if (userEmail.search(emailRule)== -1) {
+		alert('Email格式錯誤,請確認!!');
+		return false;
+	}
+	if (!chkEmailExist(userEmail)) {
+		alert('Email已存在,請重新輸入!');
+		return false;
+	}
+	//=====Email帳號檢查=====End
+
+	
+	if (!chkpwd()) {
+		return false;
+	}
+
+	var userPwd = $('#userPwd').val();
+	regist_func(userName,userEmail,userPwd);
+
+}
+
+function chkEmailExist(iuserEmail){
+	var RtnVal = true;
+	$.ajax({
+	 	url: "/www/regist/page/checkemailexist",
+		method:"post",
+		async:false,
+		data: {userEmail:iuserEmail}
+	}).done(function(result) {
+
+		if (result) {
+			RtnVal = true;
+		} else {
+			RtnVal = false;
+		}
+		
+	});
+	return RtnVal;
+}
+
+function chkNameExist(iuserName){
+	var RtnVal = true;
+	$.ajax({
+	 	url: "/www/regist/page/checknameexist",
+		method:"post",
+		async:false,
+		data: {userName:iuserName}
+	}).done(function(result) {
+		if (result) {
+			RtnVal = true;
+		} else {
+			RtnVal = false;
+		}
+	});
+	return RtnVal;
+}
+
+function ispermit(istr)
+{
+	var RtnVal = true;
+	$.ajax({
+	 	url: "/www/regist/page/ispermit",
+		method:"post",
+		async:false,
+		data: {str:istr}
+	}).done(function(result) {
+		if (result) {
+			RtnVal = true;
+		} else {
+			RtnVal = false;
+		}
+		
+	});
+	return RtnVal;
+}
+
+//檢查密碼與密碼確認是否一致
+function chkpwd()
+{
+	if($('#userPwd1').val().trim()==''||$('#userPwd2').val().trim()==''){
+		alert('密碼與確認密碼皆須輸入，請確認!');
+		return false;
+	}
+
+	if($('#userPwd1').val()!=$('#userPwd2').val()){
+		alert('密碼與確認密碼輸入不一致，請確認!');
+		return false;
+	}
+
+	$('#userPwd').val($('#userPwd1').val());
+
+	var re = /^[a-zA-Z0-9]*$/;
+
+	if(!re.test($('#userPwd').val())){
+		alert('密碼只能輸入英文或數字，請確認!');
+		return false;
+	}
+	
+	return true;
+	
+}
+
+function regist_func(iUserName,iUserEmail,iUserPwd)
+{
+	$.ajax({
+	    url: "/www/regist/page/insert",
+	    method:"post",
+	    data: {UserName:iUserName,UserEmail:iUserEmail,UserPwd:iUserPwd}
+	}).done(function(result) {
+		//alert(result);
+		if(result){
+			location.href = '/www/login/page';
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
+}
+</script>
 

@@ -1,43 +1,43 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
-		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
-		<link href="/www/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!-- 載入 Bootstrap -->
-		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><!--用本地載入就會抓不到圖-->
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/www/assets/vendor/jquery/jquery-ui-1.12.1/jquery-ui.css">
+		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.3.7/css/bootstrap.min.css"> <!-- 載入 Bootstrap -->
 		<link href="/www/assets/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen"> <!-- Bootstrap 的 RWD 套件 -->
-		<script src="/www/assets/vendor/js/tether.min.js"></script>
+		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
-		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<script src="/www/assets/vendor/jquery/1.10.2/jquery.min.js"></script>
-		<link rel="stylesheet" href="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.css">
-		<script src="/www/assets/vendor/bootstrap/3.0.2/bootstrap.min.js"></script> 
-		<link href="/www/assets/vendor/bootstrap-dialog/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
+		<script src="/www/assets/vendor/bootstrap/3.3.7/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
 		<script src="/www/assets/vendor/bootstrap-dialog/js/bootstrap-dialog.js"></script>
+		<script src="/www/assets/vendor/js/sharing.js"></script>
 
-		<title>留言板</title>
+		<title>MessageBoard</title>
 		<style type="text/css">
+			body{
+				font-family: '微軟正黑體';
+			}
+
 	        .box{
 	     		border-radius: 10px;
 			}
+
 			.box-blue{
 				border: #CDDBE0 1px solid;
 				background-color: #E3F5FC;
 				color: #2D5666;
-				font-family: '微軟正黑體';
 			}
+
 			.box-gray{
 				border: #CCCCCC 1px solid;
 				background-color: #F2F2F2;
 				color: #4D4D4D;
-				font-family: '微軟正黑體';
 			}
+
 			.box-yellow{
 				border: #CCCCCC 1px solid;
 				background-color: #FFFFE2;
 				color: #4D4D4D;
-				font-family: '微軟正黑體';
 			}
 
 			.ui-icon { 
@@ -46,13 +46,14 @@
 			    -webkit-zoom: 1.25; 
 			    -ms-zoom: 1.25;
 			}
+
 			.reply{
 				margin-left:10px;
 			}
 		</style> 
 	</head>
 	<body>
-		<form method="post" name="msgForm" id="msgForm">
+		<div class="container">
 			<!-- Modal -->
 			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 				<div class="modal-dialog" role="document">
@@ -113,158 +114,178 @@
 				    </div>
 				</div>
 			</div>
-			<div class="container">
-				<nav class="navbar navbar-default" role="navigation">
-				   	<div class="container-fluid">
-				       	<!-- Brand and toggle get grouped for better mobile display -->
-						<div class="navbar-header">
-				           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-				data-target="#bs-example-navbar-collapse-1" >
-				               <span class="sr-only">Toggle navigation</span>
-				               <span class="icon-bar"></span>
-				               <span class="icon-bar"></span>
-				               <span class="icon-bar"></span>
-				           	</button>
-				        	<!--a class="navbar-brand" href="#">MessageBoard</a-->
-				       </div>
-
-				       <!-- Collect the nav links, forms, and other content for toggling -->
-						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				           	<ul class="nav navbar-nav">
-				               <li class="active"><a href="/www/msg/list/msglist">MessageBoard</a></li>
-				               {{if ($session_level==0||$session_level==3)}}
-				               <li><a href="/www/user/list/userlist">UserPage</a></li>
-				               {{/if}}
-				                <li><a href="/www/user/personal/personalpage">PersonalPage</a></li>
-				               <li><a href="/www/main/page">Snakegame</a></li>
-				           	</ul>
-				           	<div align="right" style="margin-top:20px;">
-				           		Hi,{{$session_name}} (<font style="color:#A9A9A9; ">{{$session_level_nm}}</font>)
-				           		&nbsp;&nbsp;<a href="/www/login/page/logout">Logout</a>
-				            </div>
-				       	</div><!-- /.navbar-collapse -->
-					</div>
-				   	<!-- /.container-fluid -->
-				</nav>
-				{{if ($session_id!='')}}
-				<table class="table" style="">
-					<tr>
-						<td class="table" align="center">
-							{{$session_name}}
-							<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
-						</td>
-					</tr>
-					<tr>
-						<td class="table" align="center">
-							<label for="private_fg">
-								<input type="checkbox" class="form-check-input" name="private_fg" id="private_fg" value="1"/>悄悄話<font style="color:red;font-size: 8px;"><br>(勾選後,管理者仍然可看見留言內容,請勿違法交易,謝謝配合)</font>
-							</label>
-						</td>
-					</tr>
-					<tr>
-						<td class="table">
-							對象
-							<select name="user_select_list" id="user_select_list" class="form-control" autocomplete="on"> 
-								<option value="0">無指定對象</option>
-							    {{$userselectliststr}}
-							</select>
-							<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
-						</td>
-					</tr>
-					<tr>
-						<td class="table">內容
-							<textarea class="form-control" name="Msg_Content" id="Msg_Content"></textarea>
-						</td>
-					</tr>
-					<tr>
-						<td align="center">
-							<input type="button" class="form-control btn-primary" name="submit_btn" id="submit_btn" value="送出" onclick="submintClick();"/>
-						</td>
-					</tr>
-				</table>
-				<br>
-				{{/if}}
-				<!--分頁處理Start-->
-				<ul class="pagination">
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
-					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
-					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
-				</ul>
-				<!--分頁處理End-->
-				<table class="table img-rounded">
-					{{foreach from=$msglist item=item}}
-					<tr>
-						<td align="left" {{$bgColor}} class="{{$item.className}}" style="border: 0px;">
-							<font style="font-size:20px;font-weight:bold;">{{$item.user_name}} {{$item.receiver_nm}}</font>
-							{{if $item.user_level!=2}}
-								{{if ($session_id==$item.user_id)}}
-								<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','{{$item.msg_content}}','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
-								{{/if}}
-								{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
-								<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
-								{{/if}}
-								{{if $item.allow_reply==true}}
-								<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
-								{{/if}}
-							{{/if}}
-							<br>
-							<font style="font-size:10px;color:#A9A9A9;">{{$item.user_level_nm}}</font>
-							<br>
-							<font style="font-size:16px;">{{$item.msg_content}}</font>
-							<br><br>
-							<font style="font-size:10px;">{{$item.msg_dtm}}</font>
-							<br>
-							{{foreach from=$replymsglist item=replyitem}}
-								{{if $replyitem.pmsg_id==$item.msg_id}}
-								<br>
-								<div class="{{$replyitem.className}}" style="margin-left:50px;">
-								    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
-								    {{if $replyitem.user_level!=2}}
-									    {{if ($session_id==$replyitem.user_id)}}
-									    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','{{$replyitem.msg_content}}','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
-									    {{/if}}
-									    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
-									    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
-									    {{/if}}
-									{{/if}}
-									<br>
-								    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">{{$replyitem.user_level_nm}}</font>
-									<br>
-								    <font class="reply" style="font-size:14px;">{{$replyitem.msg_content}}</font><br><br>
-									<font class="reply" style="font-size:8px;">{{$replyitem.msg_dtm}}</font>
-								</div>
-								{{/if}}
-							{{/foreach}}
-						</td>
-					</tr>
-					<tr>
-						<td style="border: 0px;"> </td>
-					</tr>
-					{{/foreach}}
-				</table>
-				<!--分頁處理Start-->
-				<ul class="pagination">
-					<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
-					{{for $idx=1 to $pagecnt}}
-					<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
-					{{/for}}
-					<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
-				</ul>
-				<!--分頁處理End-->
+			<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+				<div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      	<div class="modal-header">
+				       	 	<h4 class="modal-title" id="addModalLabel">新增留言</h4>
+				      	</div>
+				    	<div class="modal-body">
+				        	<table class="table">
+								<tr>
+									<td class="table">
+										<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
+										<label for="private_fg">
+											<input type="checkbox" class="form-check-input" name="private_fg" id="private_fg" value="1"/>悄悄話<font style="color:red;font-size: 8px;">(勾選後,管理者仍然可看見留言內容,請勿違法交易,謝謝配合)</font>
+										</label>
+									</td>
+								</tr>
+								<tr>
+									<td class="table">
+										對象
+										<select name="user_select_list" id="user_select_list" class="form-control" autocomplete="on"> 
+											<option value="0">無指定對象</option>
+										    {{$userselectliststr}}
+										</select>
+										<input type="hidden" class="form-control" name="UserId" id="UserId" size="18" value="{{$session_id}}"/>
+									</td>
+								</tr>
+								<tr>
+									<td class="table">內容
+										<textarea wrap="physical" class="form-control" name="Msg_Content" id="Msg_Content"></textarea>
+									</td>
+								</tr>
+							</table>
+				    	</div>
+				    	<div class="modal-footer">
+				        	<button type="button" class="btn btn-primary" onclick="submintClick();">確認</button>
+				        	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+				      	</div>
+				    </div>
+				</div>
 			</div>
-		</form>
+
+			<nav class="navbar navbar-default" role="navigation">
+			   	<div class="container-fluid">
+			       	<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header">
+			           	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+			data-target="#bs-example-navbar-collapse-1" >			               
+			               <span class="icon-bar"></span>
+			               <span class="icon-bar"></span>
+			               <span class="icon-bar"></span>
+			           	</button>
+			       		<!-- Collect the nav links, forms, and other content for toggling -->
+			        	<!--a class="navbar-brand" href="#"><image style="height:100px;" src="/www/assets/vendor/images/mermaid.png"></image></a-->
+			        	<a class="navbar-brand" href="#">Hi,{{$session_name}} (<font style="color:#A9A9A9; ">{{$session_level_nm}}</font>)</a>
+			       </div>
+
+			       <!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			           	<ul class="nav navbar-nav navbar-right">
+			               <li class="active"><a href="/www/msg/list/msglist">MessageBoard</a></li>
+			               {{if ($session_level==0||$session_level==3)}}
+			               <li><a href="/www/user/list/userlist">UserPage</a></li>
+			               {{/if}}
+			                <li><a href="/www/user/personal/personalpage">PersonalPage</a></li>
+			                <li><a href="/www/main/page">Snakegame</a></li>
+			                <li><a href="/www/login/page/logout">Logout</a></li>
+			           	</ul>
+			       	</div><!-- /.navbar-collapse -->
+				</div>
+			   	<!-- /.container-fluid -->
+			</nav>
+
+			<div align="left">
+				<input type="button" class="btn btn-primary" name="" value="新增留言" data-toggle="modal" data-target="#addModal"/>
+			</div>
+			<br>
+
+			<ul class="nav nav-tabs">
+			   <li {{if $msgtab=='all'}}class="active"{{/if}}><a href="#" onclick="changeTab('all');">All</a></li>
+			   <li {{if $msgtab=='private'}}class="active"{{/if}}><a href="#" onclick="changeTab('private');">Private</a></li>
+			   <li {{if $msgtab=='system'}}class="active"{{/if}}><a href="#" onclick="changeTab('system');">System</a></li>
+			</ul>
+
+			<!--分頁處理Start-->
+			<ul class="pagination">
+				<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
+				{{for $idx=$showpagestart to $showpageend}}
+				<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+				{{/for}}
+				<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
+			</ul>
+			<!--分頁處理End-->
+			<table class="table img-rounded">
+				{{foreach from=$msglist item=item}}
+				<tr>
+					<td align="left" {{$bgColor}} class="{{$item.className}}" style="border: 0px;">
+						<font style="font-size:20px;font-weight:bold;">{{$item.user_name}} {{$item.receiver_nm}}</font>
+						{{if $item.user_level!=2}}
+							{{if ($session_id==$item.user_id)}}
+							<a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$item.user_name}}','msg','{{$item.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+							{{/if}}
+							{{if ($session_id==$item.user_id||$session_level==0||$session_level==3)}}
+							<a href="#" title="刪除" onclick="del_click('{{$item.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+							{{/if}}
+							{{if $item.allow_reply==true}}
+							<a href="#" title="回覆" data-toggle="modal" data-target="#replyModal"  onclick="reply_click('{{$session_id}}','{{$item.user_name}}','{{$item.msg_id}}','{{$item.private_fg}}','{{$item.receiver}}');"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></a>
+							{{/if}}
+						{{/if}}
+						<textarea style="display: none;" name="tempmsg_{{$item.msg_id}}" id="tempmsg_{{$item.msg_id}}">{{$item.msg_content}}</textarea>
+						<br>
+						<font style="font-size:10px;color:#A9A9A9;">{{$item.user_level_nm}}</font>
+						<br>
+						<font style="font-size:16px;">{{nl2br($item.msg_content)}}</font>
+						<br><br>
+						<font style="font-size:10px;">{{$item.msg_dtm}}</font>
+						<br>
+						{{foreach from=$replymsglist item=replyitem}}
+							{{if $replyitem.pmsg_id==$item.msg_id}}
+							<br>
+							<div class="{{$replyitem.className}}" style="margin-left:50px;">
+							    <font class="reply" style="font-size:18px;font-weight:bold;">{{$replyitem.user_name}}</font>
+							    {{if $replyitem.user_level!=2}}
+								    {{if ($session_id==$replyitem.user_id)}}
+								    <a href="#" title="編輯" data-toggle="modal" data-target="#myModal" onclick="edit_click('{{$replyitem.user_name}}','reply','{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-pencil"></span></a>
+								    {{/if}}
+								    {{if ($session_id==$replyitem.user_id||$session_level==0||$session_level==3)}}
+								    <a href="#" title="刪除" onclick="del_click('{{$replyitem.msg_id}}');"><span class="ui-icon ui-icon-trash"></span></a>
+								    {{/if}}
+								{{/if}}
+								<textarea style="display: none;" name="tempreply_{{$replyitem.msg_id}}" id="tempreply_{{$replyitem.msg_id}}">{{$replyitem.msg_content}}</textarea>
+								<br>
+							    <font style="font-size:8px;color:#A9A9A9;margin-left:10px;">{{$replyitem.user_level_nm}}</font>
+								<br>
+							    <font class="reply" style="font-size:14px;">{{nl2br($replyitem.msg_content)}}</font><br><br>
+								<font class="reply" style="font-size:8px;">{{$replyitem.msg_dtm}}</font>
+							</div>
+							{{/if}}
+						{{/foreach}}
+					</td>
+				</tr>
+				<tr>
+					<td style="border: 0px;"> </td>
+				</tr>
+				{{/foreach}}
+			</table>
+			<!--分頁處理Start-->
+			<ul class="pagination">
+				<li><a href="#" title="上一頁" onclick="changePage('{{$prepage}}');">«</a></li>
+				{{for $idx=$showpagestart to $showpageend}}
+				<li {{if ($idx==$page)}}class="active"{{/if}}><a href="#" title="第{{$idx}}頁" onclick="changePage('{{$idx}}');">{{$idx}}</a></li>
+				{{/for}}
+				<li><a href="#" title="下一頁" onclick="changePage('{{$nextpage}}');">»</a></li>
+			</ul>
+			<!--分頁處理End-->
+		</div>
 	</body>
 </html>
 <script type="text/javascript">
-window.onload = function()
-{
-    //window.setInterval("reload();", 3000);
-}
-
-function reload() {
- 	location.reload();
+function changeTab(tbName){
+	$.ajax({
+	  	url: "/www/msg/list/changetab",
+	  	method:"post",
+	  	data: {tbname:tbName}
+	}).done(function(result) {
+		if(result){
+			location.href='/www/msg/list/msglist';
+		}else{
+			alert('error');
+			return false;
+		}
+		
+	});
 }
 function submintClick()
 {
@@ -282,23 +303,6 @@ function submintClick()
 			return false;
 		}
 	}
-}
-
-function chk(str)
-{
-	var pass = true;
-	var ch;
-	var stralarm = new Array("<",">");
-	for (var i=0;i<stralarm.length;i++){ //依序載入使用者輸入的每個字元
-		for (var j=0;j<str.length;j++){
-			ch=str.substr(j,1);
-			if (ch==stralarm[i]){
-				//如果包含禁止字元
-				pass = false; //設置此變數為true
-			}
-		} 
-	}
-	return pass;
 }
 
 function add_click(iUsrId,iMsgContent)
@@ -340,7 +344,6 @@ function reply_click(iUsrId,iUserName,iPMsgId,iPrivate,iReceiver){
 	$('#reply_user_name').text(iUserName);
 	$('#reply_private').val(iPrivate);
 	$('#reply_receiver').val(iReceiver);
-	
 }
 
 function reply_submit(){
@@ -350,6 +353,11 @@ function reply_submit(){
 	var PMsgId = $('#pmsg_id').val();
 	var ReplyPrivate = $('#reply_private').val();
 	var ReplyReceiver = $('#reply_receiver').val();
+
+	if(!chk(MsgContent)){
+		alert("包含特殊字元,請修正!");
+		return false;
+	}
 
 	if(confirm('確定回覆以下內容?\n'+MsgContent)){
 		$.ajax({
@@ -394,10 +402,16 @@ function del_click(iMsgId)
 	
 }
 
-function edit_click(iUserName,iMsgContent,iMsgId)
+function edit_click(iUserName,tp,iMsgId)
 {
 	$('#edit_user').text(iUserName);
-	$('#edit_content').text(iMsgContent);
+	if(tp == 'msg'){
+		var MsgContent = $('#tempmsg_'+iMsgId).text();
+	}else{
+		var MsgContent = $('#tempreply_'+iMsgId).text();
+	}
+	//console.log(MsgContent);
+	$('#edit_content').text(MsgContent);
 	$('#edit_aid').val(iMsgId);
 }
 

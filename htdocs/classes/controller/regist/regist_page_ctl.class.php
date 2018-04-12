@@ -38,8 +38,8 @@ class Regist_Page_Ctl extends Controller
 
         $aChkUserEmail = $oModel->get(
             array('user_email' => $sUserEmail), 
-            array('field' => 'user_id'
-        ));
+            array('field' => 'user_id')
+        );
 
         unset($oModel);
 

@@ -9,15 +9,16 @@ class User_Personal_Ctl extends Controller
 
     public function get_personalpage()
     {
-        if ($this->chkSession()) {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             $oModel = new Angeldb_User_Model;
 
             $aUserInfo = $oModel->find(array('user_id' => $_SESSION['user_id']), array(
-                'field' => 'user_id, user_name, user_email, user_pwd, user_level'
+                'field' => 'user_id, user_name, user_email, user_pwd, user_level,showsysmsg'
             ));
 
             foreach ($aUserInfo as $iKey => $aValue) {
-                $aUserInfo[$iKey]['user_level_nm'] = $this->getLevelName($aUserInfo[$iKey]['user_level']);
+                $aUserInfo[$iKey]['user_level_nm'] = $oInclude->getLevelName($aUserInfo[$iKey]['user_level']);
             }
 
             unset($oModel);
@@ -28,15 +29,19 @@ class User_Personal_Ctl extends Controller
                 'session_id'       => $_SESSION['user_id'],
                 'session_name'     => $_SESSION['user_name'],
                 'session_level'    => $_SESSION['user_level'],
-                'session_level_nm' => $this->getLevelName($_SESSION['user_level'])
+                'session_level_nm' => $oInclude->getLevelName($_SESSION['user_level'])
             ));
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
+
     }
 
-    public function post_chkoldpwd(){
-        if ($this->chkSession()) {
+    public function post_chkoldpwd()
+    {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             $oModel = new Angeldb_User_Model;
 
             $sUserPwd = Input::post('s', 'userPwd');
@@ -54,21 +59,24 @@ class User_Personal_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
-    public function post_changepwd(){
-        if ($this->chkSession()) {
+    public function post_changepwd()
+    {
+        $oInclude = new Include_Func();
+        if ($oInclude->chkSession()) {
             $oModel = new Angeldb_User_Model;
 
             $sUserPwd = Input::post('s', 'userPwd');
-
+            //return $sUserPwd;
             $iUpdateCnt = $oModel->update(
                 array('user_pwd' => md5($sUserPwd)),
                 array('user_id'  => $_SESSION['user_id'])
             );
             
             unset($oModel);
-
+            return $iUpdateCnt;
             if($iUpdateCnt > 0){
                 return true;
             }else{
@@ -77,51 +85,35 @@ class User_Personal_Ctl extends Controller
         } else {
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
-    private function getLevelName($iLevel)
+    public function post_showsysmsg()
     {
-        switch ($iLevel)
-        {
-            case 0:
-                return '最高權限';
-                break;    
-            case 2:
-                return '系統';
-                break;  
-            case 3:
-                return '管理者';
-                break;  
-            case 5:
-                return '一般使用者';
-                break;  
-            case 9:
-                return '停權中';
-                break;  
-            default:
-                return '一般使用者';
-                break;
-        }
-    }
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
+            $oModel = new Angeldb_User_Model;
+            $bShowSysMsg = Input::post('b', 'open');
+            //return $bShowSysMsg;
+            $iUpdateCnt = $oModel->update(
+                array('showsysmsg' => $bShowSysMsg),
+                array('user_id' => $_SESSION['user_id'])
+            );
+            
 
-    private function chkSession()
-    {
-        session_start();
+            unset($oModel);
 
-        if ($_SESSION['user_id'] == '') {
-            $_SESSION['pagename'] = 'login';
-            return false;
-        } else {
-            $_SESSION['pagename'] = 'msg';
-            if (!isset($_SESSION['msgpage'])) {
-                $_SESSION['msgpage'] = 1;
-            }
-            if (!isset($_SESSION['msgpagesize'])) {
-                $_SESSION['msgpagesize'] = 5;
+            if($iUpdateCnt > 0){
+                $_SESSION['showsysmsg'] = $bShowSysMsg;
+                return true;
+            }else{
+                return false;
             }
             
-            return true;
+        }else{
+            return Smarty_View::make('login/login.html', array('pagename' => 'login'));
         }
+        unset($oInclude);
     }
 
 }

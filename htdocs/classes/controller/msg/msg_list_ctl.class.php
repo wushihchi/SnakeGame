@@ -4,30 +4,82 @@ class Msg_List_Ctl extends Controller
 {
     public function get_index()
     {
-
-        return Smarty_View::make('msg/l_msg.html',array('pagename'=>'msg'));
+        return Smarty_View::make('msg/l_msg.html',array('pagename' => 'msg'));
     }
 
     public function get_msglist()
     {
-        if($this->chkSession()){
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
+
+            $_SESSION['pagename'] = 'msg';
+
+            if (!isset($_SESSION['msgtab'])) {
+                $_SESSION['msgtab'] = 'all';
+            }
+
+            if (!isset($_SESSION['msgpage'])) {
+                $_SESSION['msgpage'] = 1;
+            }
+            if (!isset($_SESSION['msgpagesize'])) {
+                $_SESSION['msgpagesize'] = 5;
+            }
+
+            $sMsgtab = $_SESSION['msgtab'];
+
             $oMsgModel = new Angeldb_MsgBoard_Model;
             $oUserModel = new Angeldb_User_Model;
 
             $iPage = $_SESSION['msgpage'];
             $iPageSize = $_SESSION['msgpagesize'];
 
-            $iMsgCnt = $oMsgModel->count(array('pmsg_id' => 0), array('field'=>'msg_id'));
-
-            $iPageCnt = ceil($iMsgCnt/$iPageSize);
-
             $iLimit2 = $iPageSize*($iPage-1);
+
+            switch ($sMsgtab) {
+                case 'all':
+                    if($_SESSION['user_level']<3){
+                        $iMsgCnt = $oMsgModel->count(array('pmsg_id' => 0), array('field'=>'msg_id'));
+                        $aMsgList = $oMsgModel->find(array('pmsg_id' => 0), array(
+                            'field' => 'msg_id, user_id, msg_content, private_fg, receiver, msg_dtm',
+                            'order' => 'msg_dtm desc',
+                            'limit' => $iLimit2.','.$iPageSize
+                        ));
+
+                    }else{
+                        $iMsgCntAry = $oMsgModel->msgCnt('all',$_SESSION['user_id'],$_SESSION['showsysmsg']);
+                        $iMsgCnt = $iMsgCntAry[0]['CNT'];
+                        //return print_r($iMsgCntAry);
+                        $aMsgList = $oMsgModel->msgList('all',$_SESSION['user_id'],$_SESSION['showsysmsg'],$iLimit2,$iPageSize);
+                    }
+                    //return $iMsgCnt;
+                    break;
+                
+                case 'system':
+                    $iMsgCnt = $oMsgModel->count(array('user_id' => 23), array('field'=>'msg_id'));
+                    $aMsgList = $oMsgModel->find(array('user_id' => 23), array(
+                        'field' => 'msg_id, user_id, msg_content, private_fg, receiver, msg_dtm',
+                        'order' => 'msg_dtm desc',
+                        'limit' => $iLimit2.','.$iPageSize
+                    ));
+                    break;
+                
+                case 'private':
+                    $iMsgCntAry = $oMsgModel->msgCnt('private',$_SESSION['user_id'],$_SESSION['showsysmsg']);
+                    $iMsgCnt = $iMsgCntAry[0]['CNT'];
+                    //return print_r($iMsgCntAry);
+                    $aMsgList = $oMsgModel->msgList('private',$_SESSION['user_id'],$_SESSION['showsysmsg'],$iLimit2,$iPageSize);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
             
-            $aMsgList = $oMsgModel->find(array('pmsg_id' => 0), array(
-                'field' => 'msg_id, user_id, msg_content, private_fg, receiver, msg_dtm',
-                'order' => 'msg_dtm desc',
-                'limit' => $iLimit2.','.$iPageSize
-            ));
+            if($iPageSize>$iMsgCnt){
+                $iPageCnt = 1;
+            }else{
+                $iPageCnt = ceil($iMsgCnt/$iPageSize);
+            }
 
             $aReplyMsgList = $oMsgModel->replyMsg();
             
@@ -38,6 +90,7 @@ class Msg_List_Ctl extends Controller
                 array('user_id'=>$aMsgUser),
                 array()
             );
+
             $aUserLevelList = $oUserModel->find_pair(
                 'user_id',
                 'user_level',
@@ -85,7 +138,7 @@ class Msg_List_Ctl extends Controller
                         $aMsgList[$iKey]['receiver_nm'] = " to ".$aReceiverNameList[$aMsgList[$iKey]['receiver']];
                     }
                     
-                    $aMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
+                    $aMsgList[$iKey]['user_level_nm'] = $oInclude->getLevelName($aMsgList[$iKey]['user_level']).'  '.$sPrivate;
                     $aMsgList[$iKey]['allow_reply'] = true;
                 }
 
@@ -124,7 +177,7 @@ class Msg_List_Ctl extends Controller
                         $aReplyMsgList[$iKey]['user_name'] = $aUserNameList[$aReplyMsgList[$iKey]['user_id']];
                     }
 
-                    $aReplyMsgList[$iKey]['user_level_nm'] = $this->getLevelName($aReplyMsgList[$iKey]['user_level']).'  '.$sPrivate;
+                    $aReplyMsgList[$iKey]['user_level_nm'] = $oInclude->getLevelName($aReplyMsgList[$iKey]['user_level']).'  '.$sPrivate;
                 }
 
                 if($aReplyMsgList[$iKey]['user_id'] == $_SESSION['user_id']){
@@ -162,6 +215,25 @@ class Msg_List_Ctl extends Controller
                 $iNextPage = $iPage + 1;
             }
 
+            if($iPage <= 5){
+                $iShowPageStart = 1;
+                
+                if($iPageCnt > 10){
+                    $iShowPageEnd = 10;
+                }else{
+                    $iShowPageEnd = $iPageCnt;
+                }
+            }else{
+                if($iPage + 5 > $iPageCnt){
+                    $iShowPageStart = $iPageCnt - 9;
+                    $iShowPageEnd = $iPageCnt;
+                }else{
+                    $iShowPageStart = $iPage - 4;
+                    $iShowPageEnd = $iPage + 5;
+                }
+                
+            }
+
             return Smarty_View::make('msg/l_msg.html', array(
                 'msglist'            => $aMsgList,
                 'replymsglist'       => $aReplyMsgList,
@@ -170,27 +242,34 @@ class Msg_List_Ctl extends Controller
                 'session_id'         => $_SESSION['user_id'],
                 'session_name'       => $_SESSION['user_name'],
                 'session_level'      => $_SESSION['user_level'],
-                'session_level_nm'   => $this->getLevelName($_SESSION['user_level']),
+                'session_level_nm'   => $oInclude->getLevelName($_SESSION['user_level']),
                 'page'               => $iPage,
+                'showpagestart'      => $iShowPageStart,
+                'showpageend'        => $iShowPageEnd,
                 'pagesize'           => $iPageSize,
                 'pagecnt'            => $iPageCnt,
                 'prepage'            => $iPrePage,
-                'nextpage'           => $iNextPage
+                'nextpage'           => $iNextPage,
+                'msgtab'             => $_SESSION['msgtab']
             ));
         }else{
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
     public function post_insert()
     {
-        if($this->chkSession()){
-            $_SESSION['msgpage'] = 1;
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
+            
             $sMsgContent = str_replace("'","''",Input::post('s', 'msgcontent'));
             $iUsrId = Input::post('i', 'user_id');
             $iPMsgId = Input::post('i', 'pmsg_id');
             $bPrivateFg = Input::post('b', 'private_fg');
             $iReceiver = Input::post('i', 'receiver');
+
+            //$sMsgContent = str_replace(chr(13).chr(10),"<BR>",$sMsgContent);
 
             if($bPrivateFg != true) $bPrivateFg = false;
 
@@ -206,6 +285,7 @@ class Msg_List_Ctl extends Controller
                     'msg_dtm'     => gmdate('Y-m-d H:i:s', strtotime('+8 hours')),
                 ));
             }else{
+                $_SESSION['msgpage'] = 1;
                 $primary_key = $oModel->insert(array(
                     'user_id'     => $iUsrId,
                     'msg_content' => $sMsgContent,
@@ -225,11 +305,13 @@ class Msg_List_Ctl extends Controller
         }else{
             return Smarty_View::make('login/login.html',array('pagename'=>'login'));
         }
+        unset($oInclude);
     }
 
     public function post_update()
     {
-        if($this->chkSession()){
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
             $oModel = new Angeldb_MsgBoard_Model;
             $sMsgContent = Input::post('s', 'msgcontent');
             $iMsgId = Input::post('i', 'msg_id');
@@ -249,11 +331,13 @@ class Msg_List_Ctl extends Controller
         }else{
             return Smarty_View::make('login/login.html',array('pagename' => 'login'));
         }
+        unset($oInclude);
     }
 
     public function post_delete()
     {
-        if($this->chkSession()){
+        $oInclude = new Include_Func();
+        if($oInclude->chkSession()){
             $oModel = new Angeldb_MsgBoard_Model;
             $iMsgId = Input::post('i', 'msg_id');
             $iDeleteCnt = $oModel->delete_data(array('msg_id' => $iMsgId));
@@ -267,26 +351,7 @@ class Msg_List_Ctl extends Controller
         }else{
             return Smarty_View::make('login/login.html',array('pagename'=> 'login'));
         }
-    }
-
-    private function chkSession()
-    {
-        session_start();
-
-        if ($_SESSION['user_id'] == '') {
-            $_SESSION['pagename'] = 'login';
-            return false;
-        } else {
-            $_SESSION['pagename'] = 'msg';
-            if (!isset($_SESSION['msgpage'])) {
-                $_SESSION['msgpage'] = 1;
-            }
-            if (!isset($_SESSION['msgpagesize'])) {
-                $_SESSION['msgpagesize'] = 5;
-            }
-            
-            return true;
-        }
+        unset($oInclude);
     }
 
     public function post_changepage()
@@ -296,28 +361,10 @@ class Msg_List_Ctl extends Controller
         return true;
     }
 
-    public function getLevelName($iLevel)
-    {
-        switch ($iLevel)
-        {
-            case 0:
-                return '最高權限';
-                break;    
-            case 2:
-                return '系統';
-                break;  
-            case 3:
-                return '管理者';
-                break;  
-            case 5:
-                return '一般使用者';
-                break;  
-            case 9:
-                return '停權中';
-                break;  
-            default:
-                return '一般使用者';
-                break;
-        }
+    public function post_changetab(){
+        session_start();
+        $_SESSION['msgtab'] = Input::post('s', 'tbname');
+        $_SESSION['msgpage'] = 1;
+        return true;
     }
 }

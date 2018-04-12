@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/www/assets/vendor/css/tether.min.css">
 		<link rel="stylesheet" type="text/css" href="/www/assets/vendor/bootstrap/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/www/assets/vendor/jquery/css/jquery-ui.css">
@@ -10,65 +11,17 @@
 		<script src="/www/assets/vendor/jquery/js/jquery-3.3.1.min.js"></script> <!-- 載入 jQuery 套件 -->
 		<script src="/www/assets/vendor/jquery/js/jquery-ui.js"></script>
 		<script src="/www/assets/vendor/bootstrap/js/bootstrap.min.js"></script> <!-- 載入 Bootstrap 的 JavaScript 功能 -->
-		<script type="text/javascript">
-		function submit_btn()
-		{
-			if(chklogin() == false){
-				alert('Email帳號或密碼輸入不正確,請確認!!');
-				return false;
-			}
-
-			if(chkPermission() == false){
-				alert('帳號已停用,請洽管理人員!');
-				return false;
-			}
-
-			location.href='/www/msg/list/msglist';
-			
+		<style type="text/css">
+		body{
+			/*background-image : url('/www/assets/vendor/images/green-nature.jpg');*/
+	    	background-repeat:no-repeat;
+	    	background-attachment: fixed;
+        	background-position: center;
+	    	background-size: cover;
+			font-family: '微軟正黑體';
+			text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 10px #fff;
 		}
-
-		function chklogin(){
-			var rtnVal;
-
-			$.ajax({
-			 	url: "/www/login/page/login",
-				method:"post",
-				cache:false,
-				async:false,
-				data: {userEmail:$('#userEmail').val(),userPwd:$('#userPwd').val()}
-			}).done(function(result){
-				//alert(result);
-				if(result){
-					rtnVal = true;
-				}else{
-					rtnVal = false;
-				}
-			});
-
-			return rtnVal;
-		}
-
-		function chkPermission()
-		{
-			var rtnVal;
-			$.ajax({
-			 	url: "/www/login/page/chkpermission",
-				method:"post",
-				cache:false,
-				async:false,
-				data: {userEmail:$('#userEmail').val()}
-			}).done(function(result){
-				//alert(result);
-				if(result){
-					rtnVal = true;
-				}else{
-					rtnVal = false;
-				}
-			});
-
-			return rtnVal;
-		}
-		</script>
+		</style>
 	</head>
 	<body>
 		<form method="post" name="loginForm" id="loginForm">
@@ -88,14 +41,9 @@
 						</tr>
 						<tr>
 							<td align="center">
-								<div class="btn-group btn-group-justified">
-								   	<div class="btn-group">
-								   	 	<input type="button" class="form-control btn-primary" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
-								 	</div>
-								 	<div class="btn-group">
-								    	<input type="button" class="form-control btn-primary" name="registBtn" id="registBtn" value="註冊" onclick="javascript:location.href='/www/regist/page'">
-									</div>
-								</div>
+								<input type="button" class="form-control btn-primary" name="loginBtn" id="loginBtn" value="登入" onclick="submit_btn();">
+								<br><br>
+								還沒有帳號嗎?<a href="/www/regist/page">註冊</a>
 							</td>
 						</tr>
 					</table>
@@ -104,4 +52,63 @@
 		</form>
 	</body>
 </html>
+<script type="text/javascript">
+function submit_btn()
+{
+	if(chklogin() == false){
+		alert('Email帳號或密碼輸入不正確,請確認!!');
+		return false;
+	}
+
+	if(chkPermission() == false){
+		alert('帳號已停用,請洽管理人員!');
+		return false;
+	}
+
+	location.href='/www/msg/list/msglist';
+	
+}
+
+function chklogin(){
+	var rtnVal;
+
+	$.ajax({
+	 	url: "/www/login/page/login",
+		method:"post",
+		cache:false,
+		async:false,
+		data: {userEmail:$('#userEmail').val(),userPwd:$('#userPwd').val()}
+	}).done(function(result){
+		//alert(result);
+		if(result){
+			rtnVal = true;
+		}else{
+			rtnVal = false;
+		}
+	});
+
+	return rtnVal;
+}
+
+function chkPermission()
+{
+	var rtnVal;
+	$.ajax({
+	 	url: "/www/login/page/chkpermission",
+		method:"post",
+		cache:false,
+		async:false,
+		data: {userEmail:$('#userEmail').val()}
+	}).done(function(result){
+		//alert(result);
+		if(result){
+			rtnVal = true;
+		}else{
+			rtnVal = false;
+		}
+	});
+
+	return rtnVal;
+}
+</script>
 

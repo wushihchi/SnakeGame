@@ -1,6 +1,5 @@
 <?php
-
-class Include_Func_Ctl
+class Include_Func
 {
     public function chkSession()
     {

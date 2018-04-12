@@ -29,7 +29,7 @@ class Login_Page_Ctl extends Controller
         $sUserEmail = Input::post('s', 'userEmail');
         $aUserList = $oModel->get(
             array('user_email' => $sUserEmail, 'user_pwd' => md5($sUserPwd)),
-            array('field' => 'user_id', 'user_name', 'user_level')
+            array('field' => 'user_id', 'user_name', 'user_level','showsysmsg')
         );
 
         //return json_encode($aUserList);
@@ -43,9 +43,10 @@ class Login_Page_Ctl extends Controller
       
         session_start();
 
-        $_SESSION['user_id']    = $aUserList['user_id'];
-        $_SESSION['user_level'] = $aUserList['user_level'];
-        $_SESSION['user_name']  = $aUserList['user_name'];
+        $_SESSION['user_id']     = $aUserList['user_id'];
+        $_SESSION['user_level']  = $aUserList['user_level'];
+        $_SESSION['user_name']   = $aUserList['user_name'];
+        $_SESSION['showsysmsg']  = $aUserList['showsysmsg'];
 
         unset($oModel);
 
